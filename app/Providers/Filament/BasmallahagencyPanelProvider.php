@@ -25,6 +25,7 @@ class BasmallahagencyPanelProvider extends PanelProvider
         return $panel
             ->default()
             ->id('basmallahagency')
+            ->domain(config('app.filament_domain'))
             ->path('/')
             ->login()
             ->colors([
