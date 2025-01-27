@@ -84,6 +84,8 @@ return [
 
     'faker_locale' => env('APP_FAKER_LOCALE', 'en_US'),
 
+    'filament_domain' => env('FILAMENT_DOMAIN', 'dashboard.localhost'),
+
     /*
     |--------------------------------------------------------------------------
     | Encryption Key
