@@ -24,6 +24,8 @@ class FaqsResource extends Resource
 {
     protected static ?string $model = FAQ::class;
 
+    protected static ?string $navigationGroup = 'Contents';
+
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static ?string $breadcrumb = 'FAQs';
@@ -38,16 +40,16 @@ class FaqsResource extends Resource
         return $form
             ->schema([
                 Hidden::make('user_id')
-                ->default(Auth::user()->id),
+                    ->default(Auth::user()->id),
                 TextInput::make('ask_question')
-                ->label('Pertanyaan')
-                ->required(),
+                    ->label('Pertanyaan')
+                    ->required(),
                 RichEditor::make('answer')
-                ->label('Jawaban')
-                ->disableToolbarButtons([
-                    'attachFiles'
-                ])
-                ->required(),
+                    ->label('Jawaban')
+                    ->disableToolbarButtons([
+                        'attachFiles'
+                    ])
+                    ->required(),
             ])->columns(1);
     }
 
@@ -56,7 +58,7 @@ class FaqsResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('ask_question')
-                ->label('Question'),
+                    ->label('Question'),
             ])
             ->filters([
                 //
