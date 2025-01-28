@@ -22,20 +22,19 @@ class HousingPartner extends Model
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
 
-    protected static function boot()
+    protected static function booted()
     {
-        parent::boot();
+        $filamentStorage = Storage::disk('filament_disk');
 
-        static::deleting(function($housingPartner) {
-            if($housingPartner->image_url && Storage::disk('public')->exists($housingPartner->image_url)){
-                Storage::disk('public')->delete($housingPartner->image_url);
+        static::deleting(function ($housingPartner) use ($filamentStorage) {
+            if ($housingPartner->image_url && $filamentStorage->exists($housingPartner->image_url)) {
+                $filamentStorage->delete($housingPartner->image_url);
             }
         });
     }
-    
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
-    
 }

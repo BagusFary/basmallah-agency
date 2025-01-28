@@ -86,6 +86,8 @@ return [
 
     'filament_domain' => env('FILAMENT_DOMAIN', 'dashboard.localhost'),
 
+    'filament_systemdisk' => env('FILAMENT_FILESYSTEM_DISK', 'filament_disk'),
+
     /*
     |--------------------------------------------------------------------------
     | Encryption Key
