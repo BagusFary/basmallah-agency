@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
-use Storage;
+use Illuminate\Support\Facades\Storage;
 
 class HeroImage extends Model
 {
@@ -13,16 +13,15 @@ class HeroImage extends Model
     protected $table = 'hero_images';
     protected $guarded = ['id'];
 
-    protected static function boot()
+    protected static function booted()
     {
-        parent::boot();
+        // parent::boot();
+        $filamentStorage = Storage::disk('filament_disk');
 
-        static::deleting(function($heroImage) {
-            if($heroImage->image_url && Storage::disk('public')->exists($heroImage->image_url)){
-                Storage::disk('public')->delete($heroImage->image_url);
+        static::deleting(function ($heroImage) use ($filamentStorage) {
+            if ($heroImage->image_url && $filamentStorage->exists($heroImage->image_url)) {
+                $filamentStorage->delete($heroImage->image_url);
             }
         });
     }
-
-    
 }

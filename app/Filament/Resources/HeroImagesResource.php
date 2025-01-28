@@ -3,23 +3,16 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\HeroImagesResource\Pages;
-use App\Filament\Resources\HeroImagesResource\RelationManagers;
 use App\Models\HeroImage;
-use App\Models\HeroImages;
-use Auth;
-use Filament\Forms;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Hidden;
-use Filament\Forms\Components\Repeater;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
-use Storage;
 use Symfony\Component\Uid\Ulid;
 
 class HeroImagesResource extends Resource
@@ -28,7 +21,7 @@ class HeroImagesResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
-
+    protected static ?string $navigationGroup = 'Contents';
 
     public static function form(Form $form): Form
     {
@@ -43,7 +36,7 @@ class HeroImagesResource extends Resource
                         return (string) "heroImages/{$hashedName}.{$fileExtension}";
                     }),
                 Hidden::make('user_id')
-                ->default(Auth::user()->id)
+                    ->default(Auth::user()->id)
             ]);
     }
 
@@ -85,7 +78,4 @@ class HeroImagesResource extends Resource
             'edit' => Pages\EditHeroImages::route('/{record}/edit'),
         ];
     }
-
-
-
 }
