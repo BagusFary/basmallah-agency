@@ -86,8 +86,10 @@ class UserResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('name'),
-                TextColumn::make('email'),
+                TextColumn::make('name')
+                ->searchable(),
+                TextColumn::make('email')
+                ->searchable(),
                 TextColumn::make('role')
                     ->color(fn(string $state): string => match ($state) {
                         'superadmin' => 'danger',
@@ -99,6 +101,11 @@ class UserResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make()
+                ->requiresConfirmation()
+                ->hidden(function ( User $record) {
+                    return $record->role === 'superadmin';
+                }),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
