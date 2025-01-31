@@ -8,4 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class UserSubmission extends Model
 {
     use HasUuids;
+    protected $table = 'user_submissions';
+    protected $primary_key = 'id';
+    protected $guarded = ['id'];
 }
