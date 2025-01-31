@@ -1,8 +1,7 @@
 <?php
 
 use App\Http\Controllers\LandingPage\IndexController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::controller(IndexController::class)->group(function () {
-    Route::get('/', 'index');
-});
+Route::get('/house/list', [IndexController::class, 'getHouseLists']);

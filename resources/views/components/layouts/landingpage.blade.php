@@ -1211,7 +1211,7 @@
     @endif
 </head>
 
-<body class="font-sans antialiased dark:bg-gray-900 dark:text-white/50">
+<body class="font-sans transition ease-in-out antialiased bg-vintage-light dark:bg-vintage-dark dark:text-white/50 relative">
     @yield('content')
 
 
