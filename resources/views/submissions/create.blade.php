@@ -6,7 +6,7 @@
 
 @section('content')
     @extends('components.layouts.navbar')
-    @if ($errors->any())
+    {{-- @if ($errors->any())
         <div class="alert alert-danger">
             <ul>
                 @foreach ($errors->all() as $error)
@@ -14,10 +14,10 @@
                 @endforeach
             </ul>
         </div>
-    @endif
+    @endif --}}
     <section class="container mx-auto">
         <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto">
-            <div class="w-full bg-white rounded-lg shadow dark:border dark:bg-gray-800 dark:border-gray-700">
+            <div class="w-full bg-white rounded-lg shadow border-2 dark:border dark:bg-gray-800 dark:border-gray-700">
                 <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
                     <div class="flex-row self-start mb-3">
                         <a href="#" class="flex self-start mt-5 text-2xl font-semibold text-gray-900 dark:text-white">
@@ -29,43 +29,44 @@
                         @method('POST')
                         @csrf
                         <input type="hidden" name="id" value="{{ old('id') }}">
-                        <input type="hidden" id="instalment_amount_data" name="instalment_amount_data" value="{{ old('instalment_amount_data') }}">
-                        <input type="hidden" id="avg_monthly_turnover_data" name="avg_monthly_turnover_data" value="{{ old('avg_monthly_turnover_data') }}">
+                        <input type="hidden" id="instalment_amount" name="instalment_amount" value="{{ old('instalment_amount') }}">
+                        <input type="hidden" id="avg_monthly_turnover" name="avg_monthly_turnover" value="{{ old('avg_monthly_turnover') }}">
                         <input type="hidden" id="join_husband_data" name="join_husband_data" value="{{ old('join_husband_data') }}">
-                        <input type="hidden" id="join_wife_data" name="join_wife_data" value="{{ old('join_wife_data') }}">
+                        <input type="hidden" id="join_wife" name="join_wife" value="{{ old('join_wife') }}">
+                        <input type="hidden" id="self_income" name="self_income" value="{{ old('self_income') }}">
                         <div>
                             <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Email *</label>
-                            <input type="email" name="email" id="email" value="{{ old("email") }}" class=" bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Masukkan Email" autocomplete="off" required>
+                            <input type="email" name="email" id="email" value="{{ old("email") }}" class=" bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Masukkan Email" autocomplete="off">
                             @error('email')
-                                <div class="mt-2 text-sm text-red-600 dark:text-red-500"><span class="font-medium">Warning, </span> {{ $message }}</div>
+                                <div class="mt-2 text-sm text-red-600 dark:text-red-500"><span class="font-medium">Peringatan, </span> {{ $message }}</div>
                             @enderror
                         </div>
                         <div>
                             <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nama</label>
                             <input type="text" name="name" value="{{ old("name") }}" id="name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Masukkan Nama Lengkap" autocomplete="off" required>
                             @error('name')
-                                <div class="mt-2 text-sm text-red-600 dark:text-red-500"><span class="font-medium">Warning, </span> {{ $message }}</div>
+                                <div class="mt-2 text-sm text-red-600 dark:text-red-500"><span class="font-medium">Peringatan, </span> {{ $message }}</div>
                             @enderror
                         </div>
                         <div>
                             <label for="id_card" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">NIK</label>
                             <input type="text" inputmode="numeric" name="id_card" id="id_card" value="{{ old("id_card") }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Masukkan NIK" autocomplete="off" required>
                             @error('id_card')
-                                <div class="mt-2 text-sm text-red-600 dark:text-red-500"><span class="font-medium">Warning, </span> {{ $message }}</div>
+                                <div class="mt-2 text-sm text-red-600 dark:text-red-500"><span class="font-medium">Peringatan, </span> {{ $message }}</div>
                             @enderror
                         </div>
                         <div>
                             <label for="address" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Alamat</label>
                             <input type="text" name="address" id="address" value="{{ old("address") }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Masukkan Alamat" autocomplete="off" required>
                             @error('address')
-                                <div class="mt-2 text-sm text-red-600 dark:text-red-500"><span class="font-medium">Warning, </span> {{ $message }}</div>
+                                <div class="mt-2 text-sm text-red-600 dark:text-red-500"><span class="font-medium">Peringatan, </span> {{ $message }}</div>
                             @enderror
                         </div>
                         <div>
                             <label for="phone" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nomor WhatsApp</label>
                             <input type="text" inputmode="numeric" name="phone" id="phone" value="{{ old("phone") }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Contoh. 089*********" autocomplete="off" required>
                             @error('phone')
-                                <div class="mt-2 text-sm text-red-600 dark:text-red-500"><span class="font-medium">Warning, </span> {{ $message }}</div>
+                                <div class="mt-2 text-sm text-red-600 dark:text-red-500"><span class="font-medium">Peringatan, </span> {{ $message }}</div>
                             @enderror
                         </div>
                         <div>
@@ -87,12 +88,15 @@
                             <label for="self_employee_as" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Bidang Wirausaha</label>
                             <input type="text" name="self_employee_as" id="self_employee_as" value="{{ old("self_employee_as") }}"class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Masukkan Bidang Usaha" autocomplete="off" required>
                             @error('self_employee_as')
-                                <div class="mt-2 text-sm text-red-600 dark:text-red-500"><span class="font-medium">Warning, </span> {{ $message }}</div>
+                                <div class="mt-2 text-sm text-red-600 dark:text-red-500"><span class="font-medium">Peringatan, </span> {{ $message }}</div>
                             @enderror
                         </div>
                         <div id="avg_monthly_turnover_section">
-                            <label for="avg_monthly_turnover" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Berapa rata rata omset anda bulanan Anda?</label>
-                            <input type="text" inputmode="numeric" name="avg_monthly_turnover" id="avg_monthly_turnover" value="{{ old("avg_monthly_turnover") }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Masukkan Omset Bulanan" autocomplete="off" required>
+                            <label for="avg_monthly_turnover_input" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Berapa rata rata omset anda bulanan Anda?</label>
+                            <input type="text" inputmode="numeric" name="avg_monthly_turnover_input" id="avg_monthly_turnover_input" value="{{ old("avg_monthly_turnover_input") }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Masukkan Omset Bulanan" autocomplete="off" required>
+                            @error('avg_monthly_turnover')
+                                <div class="mt-2 text-sm text-red-600 dark:text-red-500"><span class="font-medium">Peringatan, </span> {{ $message }}</div>
+                            @enderror
                         </div>
                         <div>
                             <label for="income" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Penghasilan</label>
@@ -106,10 +110,10 @@
                             </div>
                         </div>
                         <div id="self_income_section">
-                            <label for="self_income" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Jumlah Penghasilan Pribadi</label>
-                            <input type="text" inputmode="numeric" name="self_income" id="self_income" value="{{ old("self_income") }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Masukkan Jumlah Penghasilan Pribadi" autocomplete="off" required>
+                            <label for="self_income_input" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Jumlah Penghasilan Pribadi</label>
+                            <input type="text" inputmode="numeric" name="self_income_input" id="self_income_input" value="{{ old("self_income_input") }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Masukkan Jumlah Penghasilan Pribadi" autocomplete="off" required>
                             @error('self_income')
-                                <div class="mt-2 text-sm text-red-600 dark:text-red-500"><span class="font-medium">Warning, </span> {{ $message }}</div>
+                                <div class="mt-2 text-sm text-red-600 dark:text-red-500"><span class="font-medium">Peringatan, </span> {{ $message }}</div>
                             @enderror
                         </div>
                         <div id="join_income_section" class="hidden border border-solid rounded-lg p-5">
@@ -117,15 +121,15 @@
                                 <label for="join_husband" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Jumlah Penghasilan Suami</label>
                                 <input type="text" inputmode="numeric" name="join_husband" id="join_husband" value="{{ old("join_husband") }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Masukkan Jumlah Penghasilan Suami" autocomplete="off">
                             </div>
-                            @error('join_husband_data')
-                                <div class="mt-2 text-sm text-red-600 dark:text-red-500"><span class="font-medium">Warning, </span> {{ $message }}</div>
+                            @error('join_husband')
+                                <div class="mt-2 text-sm text-red-600 dark:text-red-500"><span class="font-medium">Peringatan, </span> {{ $message }}</div>
                             @enderror
                             <div class="mt-2">
-                                <label for="join_wife" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Jumlah Penghasilan Istri</label>
-                                <input type="text" inputmode="numeric" name="join_wife" id="join_wife" value="{{ old("join_wife") }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Masukkan Jumlah Penghasilan Istri" autocomplete="off">
+                                <label for="join_wife_input" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Jumlah Penghasilan Istri</label>
+                                <input type="text" inputmode="numeric" name="join_wife_input" id="join_wife_input" value="{{ old("join_wife_input") }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Masukkan Jumlah Penghasilan Istri" autocomplete="off">
                             </div>
-                            @error('join_wife_data')
-                                <div class="mt-2 text-sm text-red-600 dark:text-red-500"><span class="font-medium">Warning, </span> {{ $message }}</div>
+                            @error('join_wife')
+                                <div class="mt-2 text-sm text-red-600 dark:text-red-500"><span class="font-medium">Peringatan, </span> {{ $message }}</div>
                             @enderror
                             <div class="mt-2">
                                 <label for="join-total" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Total Jumlah Penghasilan Joint Income</label>
@@ -144,10 +148,10 @@
                             </div>
                         </div>
                         <div id="instalment_amount_section" class="hidden">
-                            <label for="instalment_amount" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Jumlah Cicilan</label>
-                            <input type="instalment_amount" name="instalment_amount" id="instalment_amount" value="{{ old("instalment_amount") }}"  class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Masukkan Jumlah Cicilan">
-                            @error('instalment_amount_data')
-                                <div class="mt-2 text-sm text-red-600 dark:text-red-500"><span class="font-medium">Warning, </span> {{ $message }}</div>
+                            <label for="instalment_amount_input" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Jumlah Cicilan</label>
+                            <input type="text" inputmode="numeric" name="instalment_amount_input" id="instalment_amount_input" value="{{ old("instalment_amount_input") }}"  class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Masukkan Jumlah Cicilan">
+                            @error('instalment_amount')
+                                <div class="mt-2 text-sm text-red-600 dark:text-red-500"><span class="font-medium">Peringatan, </span> {{ $message }}</div>
                             @enderror
                         </div>
                         <div class="flex items-center justify-center">
