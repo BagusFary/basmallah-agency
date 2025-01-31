@@ -15,7 +15,6 @@ class SubmissionController extends Controller
     public function store(UserSubmissionRequest $request)
     {
         dd($request);
-
         $data = UserSubmission::create([
             ''
         ]);
