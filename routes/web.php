@@ -9,7 +9,7 @@ Route::get('/', function () {
 
 Route::prefix('housing-partners')->name('housing-partners.')->group(function () {
     Route::controller(SubmissionController::class)->group(function () {
-        Route::get('/1/submission', 'create')->name('create');
+        Route::get('/{id}/submission', 'create')->name('create');
         Route::post('/submission/store', 'store')->name('store');
     });
 });

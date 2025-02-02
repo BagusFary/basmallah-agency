@@ -21,7 +21,7 @@
                 <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
                     <div class="flex-row self-start mb-3">
                         <a href="#" class="flex self-start mt-5 text-2xl font-semibold text-gray-900 dark:text-white">
-                            Wisdom Wagir
+                            {{ $housingPartners->name }}
                         </a>
                         <span class="flex self-start text-gray-400">Form Submission</span>
                     </div>
@@ -29,9 +29,10 @@
                         @method('POST')
                         @csrf
                         <input type="hidden" name="id" value="{{ old('id') }}">
+                        <input type="hidden" name="housing_partner_id" value="{{ $housingPartners->id }}">
                         <input type="hidden" id="instalment_amount" name="instalment_amount" value="{{ old('instalment_amount') }}">
                         <input type="hidden" id="avg_monthly_turnover" name="avg_monthly_turnover" value="{{ old('avg_monthly_turnover') }}">
-                        <input type="hidden" id="join_husband_data" name="join_husband_data" value="{{ old('join_husband_data') }}">
+                        <input type="hidden" id="join_husband" name="join_husband" value="{{ old('join_husband') }}">
                         <input type="hidden" id="join_wife" name="join_wife" value="{{ old('join_wife') }}">
                         <input type="hidden" id="self_income" name="self_income" value="{{ old('self_income') }}">
                         <div>
@@ -118,8 +119,8 @@
                         </div>
                         <div id="join_income_section" class="hidden border border-solid rounded-lg p-5">
                             <div>
-                                <label for="join_husband" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Jumlah Penghasilan Suami</label>
-                                <input type="text" inputmode="numeric" name="join_husband" id="join_husband" value="{{ old("join_husband") }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Masukkan Jumlah Penghasilan Suami" autocomplete="off">
+                                <label for="join_husband_input" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Jumlah Penghasilan Suami</label>
+                                <input type="text" inputmode="numeric" name="join_husband_input" id="join_husband_input" value="{{ old("join_husband_input") }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Masukkan Jumlah Penghasilan Suami" autocomplete="off">
                             </div>
                             @error('join_husband')
                                 <div class="mt-2 text-sm text-red-600 dark:text-red-500"><span class="font-medium">Peringatan, </span> {{ $message }}</div>

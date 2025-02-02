@@ -24,9 +24,9 @@ class UserSubmissionRequest extends FormRequest
         return [
             'email' => 'required|email|unique:user_submissions|max:255',
             'name' => 'required|max:255',
-            'id_card' => 'required|max:50',
+            'id_card' => 'required|unique:user_submissions|max:50',
             'address' => 'required|max:255',
-            'phone' => 'required|max:50',
+            'phone' => 'required|unique:user_submissions|max:50',
             'self_employee_as' => 'max:255',
             'instalment_amount' => 'nullable|numeric|min:1',
             'avg_monthly_turnover' => 'nullable|numeric|min:1',
