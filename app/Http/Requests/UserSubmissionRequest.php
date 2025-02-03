@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UserSubmissionRequest extends FormRequest
@@ -27,12 +28,29 @@ class UserSubmissionRequest extends FormRequest
             'id_card' => 'required|unique:user_submissions|max:50',
             'address' => 'required|max:255',
             'phone' => 'required|unique:user_submissions|max:50',
+            'employment_status' => 'required|in:self_employees,civil_servants,employees',
             'self_employee_as' => 'max:255',
-            'instalment_amount' => 'nullable|numeric|min:1',
-            'avg_monthly_turnover' => 'nullable|numeric|min:1',
-            'join_husband' => 'nullable|numeric|min:1',
-            'join_wife' => 'nullable|numeric|min:1',
-            'self_income' => 'nullable|numeric|min:1'
+            'has_instalment' => 'required|in:1,0',
+            'instalment_amount' => [
+                'numeric',
+                Rule::when($this->has_instalment == 1, ['min:1']), 
+            ],    
+            'avg_monthly_turnover' => [
+                'numeric',
+                Rule::when($this->employment_status == 'self_employees', ['min:1'])
+            ],
+            'join_husband' => [
+                'numeric',
+                Rule::when($this->salary == 'joint_income', ['min:1'])
+            ],
+            'join_wife' => [
+                'numeric',
+                Rule::when($this->salary == 'joint_income', ['min:1'])
+            ],
+            'self_income' => [
+                'numeric',
+                Rule::when($this->salary == 'personal_income', ['min:1'])
+            ]
         ];
     }
 

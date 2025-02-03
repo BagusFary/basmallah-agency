@@ -1,16 +1,33 @@
+let housingPartnerCode = '';
 
 $("input[name='employment_status']").on("change", checkEmployementStatus);
 $("input[name='salary']").on("change", checkIncomeStatus);
 $("input[name='has_instalment']").on("change", checkInstalmentStatus);
 
-$("#join_husband_input, #join_wife_input").on("input", function (event) {
+$("#join_husband_input, #join_wife_input").keyup(function (event) {
     validatePriceInput(event);
     updateTotalIncome();
 });
 
-$('#self_income_input, #avg_monthly_turnover_input, #instalment_amount_input').on("input", function(event){
+$('#id_card').keyup(function (event) {
+    let input = $(event.target);
+    let valueReplaced = input.val().replace(/\D/g, '');
+    input.val(valueReplaced);
+});
+
+$('#self_income_input, #avg_monthly_turnover_input, #instalment_amount_input').keyup(function (event) {
     validatePriceInput(event);
-})
+});
+
+$('#submit-submission').on('click', function(event){
+    event.preventDefault();
+    const elementCode = document.createElement('input');
+    elementCode.name = 'code';
+    elementCode.value = housingPartnerCode;
+    elementCode.type = 'hidden';
+    $('#form-submission').append(elementCode);
+    $('#form-submission').submit();
+});
 
 $('#phone').on("input", function(event){
     validatePhoneInput(event);
@@ -19,6 +36,8 @@ $('#phone').on("input", function(event){
 function clearSelfEmployeeInput(){
     $('#self_employee_as').val("");
     $('#avg_monthly_turnover_input').val("");
+
+    $('#avg_monthly_turnover').val("0");
 
     $('#self_employee_as').prop("required",false);
     $('#avg_monthly_turnover_input').prop("required",false);
@@ -42,14 +61,20 @@ function clearJointIncomeInput(){
     $("#join_husband_input").val("");
     $("#join_wife_input").val("");
     $("#total_joint").text("Rp.0");
+    
+    $("#join_husband").val("0");
+    $("#join_wife").val("0");
 
-    $('#join_husband').prop('required',false); 
+
+    $('#join_husband_input').prop('required',false); 
     $('#join_wife_input').prop('required',false); 
 }
 
 function clearSelfIncomeInput(){
     $("#self_income_input").val("");
     $("#total_joint").text("Rp.0");
+
+    $('#self_income').val('0')
 
     $('#self_income_input').prop('required',false); 
 }
@@ -64,7 +89,7 @@ function checkIncomeStatus(){
     } else {
         $('#self_income_section').addClass('hidden'); 
         $('#join_income_section').removeClass('hidden');
-        $('#join_husband').prop('required',true); 
+        $('#join_husband_input').prop('required',true); 
         $('#join_wife_input').prop('required',true);  
         clearSelfIncomeInput();
     }
@@ -116,6 +141,8 @@ $("#toggle-join-income").on("click", function () {
 
 
 $(document).ready(function (){
+    housingPartnerCode = $('#code').val();
+    $('#code').remove();
     checkEmployementStatus();
     checkIncomeStatus();
     checkInstalmentStatus();
