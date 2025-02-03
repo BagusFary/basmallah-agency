@@ -16,26 +16,31 @@ class SubmissionController extends Controller
             'housingPartners' => $housingPartners
         ]);
     }
-    public function store(UserSubmissionRequest $request)
+
+    public function store(UserSubmissionRequest $request, $id)
     {   
         // bug (instalment_amount cannot be null confirm);
-        dd($request->all());
         // Creating Referral Code
-        $housingPartners = HousingPartner::find($request);
-        $housingPartnerCode = $housingPartners['0']['code'];
-        $year = date('Y');
-        $lastNumber = UserSubmission::where('referral_code', 'LIKE', "%-$year-%")
-                                ->max('referral_code'); 
+        dd($request->validated());
+        $housingPartnersExist = HousingPartner::where('id', $id)
+                                            ->where('code', $request['code'])
+                                            ->exists();
+        if(!$housingPartnersExist){
+            return abort('403');
+        }
 
-        $nextNumber = $lastNumber ? intval(substr($lastNumber, -6)) + 1 : 1;
-        $formattedNumber = str_pad($nextNumber, 6, '0', STR_PAD_LEFT);
+        $date = date('YMD');
+        $randomNumber = rand(100000, 999999);
+        $referralCode = strtoupper("{$request['code']}-{$date}-{$randomNumber}");
 
-        $referralCode = strtoupper("{$housingPartnerCode}-{$year}-{$formattedNumber}");
-
+        $formData = [
+            'referral_code' => $referralCode,
+            'housing_partner_id' => $id,
+            ...$request->validated()
+        ];
+        
         // Saving data to databases
-        $data = UserSubmission::create(
-            array_merge($request->all(), ['referral_code' => $referralCode])
-        );
+        $data = UserSubmission::create($formData);
         
         if ($data) {
             dd('Pendaftaran Berhasil!');

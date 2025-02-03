@@ -10,6 +10,6 @@ Route::get('/', function () {
 Route::prefix('housing-partners')->name('housing-partners.')->group(function () {
     Route::controller(SubmissionController::class)->group(function () {
         Route::get('/{id}/submission', 'create')->name('create');
-        Route::post('/submission/store', 'store')->name('store');
+        Route::post('/{id}/submission', 'store')->name('store');
     });
 });

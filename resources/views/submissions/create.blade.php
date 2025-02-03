@@ -6,7 +6,7 @@
 
 @section('content')
     @extends('components.layouts.navbar')
-    {{-- @if ($errors->any())
+    @if ($errors->any())
         <div class="alert alert-danger">
             <ul>
                 @foreach ($errors->all() as $error)
@@ -14,7 +14,7 @@
                 @endforeach
             </ul>
         </div>
-    @endif --}}
+    @endif
     <section class="container mx-auto">
         <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto">
             <div class="w-full bg-white rounded-lg shadow border-2 dark:border dark:bg-gray-800 dark:border-gray-700">
@@ -25,13 +25,13 @@
                         </a>
                         <span class="flex self-start text-gray-400">Form Submission</span>
                     </div>
-                    <form class="space-y-4 md:space-y-6" action="{{ route("housing-partners.store") }}" method="post">
+                    <form class="space-y-4 md:space-y-6" id="form-submission" action="{{ route("housing-partners.store", $housingPartners->id) }}" method="post">
                         @method('POST')
                         @csrf
                         <input type="hidden" name="id" value="{{ old('id') }}">
-                        <input type="hidden" name="housing_partner_id" value="{{ $housingPartners->id }}">
-                        <input type="hidden" id="instalment_amount" name="instalment_amount" value="{{ old('instalment_amount') }}">
-                        <input type="hidden" id="avg_monthly_turnover" name="avg_monthly_turnover" value="{{ old('avg_monthly_turnover') }}">
+                        <input type="hidden" id="code" name="code" value="{{ $housingPartners->code }}">
+                        <input type="hidden" id="instalment_amount" name="instalment_amount" value="{{ old('instalment_amount') ?? '0' }}">
+                        <input type="hidden" id="avg_monthly_turnover" name="avg_monthly_turnover" value="{{ old('avg_monthly_turnover') ?? '0' }}">
                         <input type="hidden" id="join_husband" name="join_husband" value="{{ old('join_husband') }}">
                         <input type="hidden" id="join_wife" name="join_wife" value="{{ old('join_wife') }}">
                         <input type="hidden" id="self_income" name="self_income" value="{{ old('self_income') }}">
@@ -81,7 +81,7 @@
                                 <label for="civil_servants" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">PNS</label>
                             </div>
                             <div class="flex items-center my-2">
-                                <input {{ old('employment_status', 'false') == 'employee' ? 'checked' : '' }} id="employee" type="radio" value="employee" name="employment_status" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                <input {{ old('employment_status', 'false') == 'employees' ? 'checked' : '' }} id="employee" type="radio" value="employees" name="employment_status" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
                                 <label for="employee" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Pegawai Swasta</label>
                             </div>
                         </div>
@@ -140,11 +140,11 @@
                         <div>
                             <label for="has_instalment" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Apakah Anda memiliki cicilan?</label>
                             <div class="flex items-center my-2">
-                                <input {{ old('has_instalment') == 'true' ? 'checked' : '' }} id="instalment_yes" type="radio" value="true" name="has_instalment" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                <input {{ old('has_instalment') == '1' ? 'checked' : '' }} id="instalment_yes" type="radio" value="1" name="has_instalment" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
                                 <label for="instalment_yes" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Ya</label>
                             </div>
                             <div class="flex items-center my-2">
-                                <input {{ old('has_instalment', 'false') == 'false' ? 'checked' : '' }} id="instalment_no" type="radio" value="false" name="has_instalment" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                <input {{ old('has_instalment', '0') == '0' ? 'checked' : '' }} id="instalment_no" type="radio" value="0" name="has_instalment" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
                                 <label for="instalment_no" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Tidak</label>
                             </div>
                         </div>
