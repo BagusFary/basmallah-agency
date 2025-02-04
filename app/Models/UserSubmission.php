@@ -15,7 +15,7 @@ class UserSubmission extends Model
     {
         return $this->hasMany(Income::class, 'user_submission_id', 'id');
     }
-    public function housingPatner() : BelongsTo
+    public function housingPartner() : BelongsTo
     {
         return $this->belongsTo(HousingPartner::class, 'housing_partner_id', 'id');
     }

@@ -22,6 +22,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\UserSubmissionsResource\Pages;
 use App\Filament\Resources\UserSubmissionsResource\RelationManagers;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
 
 class UserSubmissionsResource extends Resource
 {
@@ -34,30 +36,42 @@ class UserSubmissionsResource extends Resource
         return $form
             ->schema([
                 Select::make('housing_partner_id')
-                    ->relationship(name: 'housingPatner', titleAttribute: 'name')
-                    ->native(false),
-                TextInput::make('email'),
-                TextInput::make('phone'),
-                TextInput::make('name'),
-                TextInput::make('id_card'),
-                TextInput::make('address'),
+                    ->relationship(name: 'housingPartner', titleAttribute: 'name')
+                    ->native(false)
+                    ->label('Perumahan'),
+                TextInput::make('email')
+                ->label('Email'),
+                TextInput::make('phone')
+                ->label('No Whatsapp'),
+                TextInput::make('name')
+                ->label('Nama'),
+                TextInput::make('id_card')
+                ->label('NIK'),
+                TextInput::make('address')
+                ->label('Alamat'),
                 Select::make('employment_status')
                     ->options([
                         'self_employees' => 'Wirausaha',
                         'civil_servants' => 'PNS',
                         'employees' => 'Karyawan'
                     ])
-                    ->native(false),
+                    ->native(false)
+                    ->label('Status Pekerjaan'),
                 TextInput::make('avg_monthly_turnover')
-                    ->numeric(),
+                    ->numeric()
+                    ->label('Omset Rata-Rata Bulanan'),
                 Radio::make('has_instalment')
                     ->options([
                         '1' => 'Yes',
                         '0' => 'No'
-                    ]),
-                TextInput::make('instalment_amount'),
-                TextInput::make('referral_code'),
+                    ])
+                    ->label('Punya Cicilan?'),
+                TextInput::make('instalment_amount')
+                ->label('Jumlah Cicilan'),
+                TextInput::make('referral_code')
+                ->label('Kode Referal'),
                 Repeater::make('Income')
+                ->label('Penghasilan')
                     ->schema([
                         Select::make('type')
                             ->options([
@@ -103,10 +117,12 @@ class UserSubmissionsResource extends Resource
 
         return $table
             ->columns([
-                TextColumn::make('housingPatner.name')
-                    ->label('Perumahan'),
+                TextColumn::make('housingPartner.name')
+                    ->label('Perumahan')
+                    ->searchable(),
                 TextColumn::make('id_card')
-                    ->label('NIK'),
+                    ->label('NIK')
+                    ->searchable(['email','address', 'phone', 'name', 'id_card', ]),
                 TextColumn::make('name')
                     ->label('Nama'),
                 TextColumn::make('email')
@@ -116,7 +132,7 @@ class UserSubmissionsResource extends Resource
 
             ])
             ->filters([
-                //
+                
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
