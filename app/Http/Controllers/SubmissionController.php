@@ -19,9 +19,7 @@ class SubmissionController extends Controller
 
     public function store(UserSubmissionRequest $request, $id)
     {   
-        // bug (instalment_amount cannot be null confirm);
         // Creating Referral Code
-        dd($request->validated());
         $housingPartnersExist = HousingPartner::where('id', $id)
                                             ->where('code', $request['code'])
                                             ->exists();
@@ -29,7 +27,7 @@ class SubmissionController extends Controller
             return abort('403');
         }
 
-        $date = date('YMD');
+        $date = date('Ymd');
         $randomNumber = rand(100000, 999999);
         $referralCode = strtoupper("{$request['code']}-{$date}-{$randomNumber}");
 

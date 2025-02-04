@@ -6,15 +6,6 @@
 
 @section('content')
     @extends('components.layouts.navbar')
-    @if ($errors->any())
-        <div class="alert alert-danger">
-            <ul>
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
     <section class="container mx-auto">
         <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto">
             <div class="w-full bg-white rounded-lg shadow border-2 dark:border dark:bg-gray-800 dark:border-gray-700">
