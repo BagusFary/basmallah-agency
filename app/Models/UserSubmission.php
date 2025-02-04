@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class UserSubmission extends Model
 {
+    // Merge Conflict This Model 
     use HasUuids;
     protected $table = 'user_submissions';
     protected $primary_key = 'id';
