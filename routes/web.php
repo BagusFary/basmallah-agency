@@ -1,11 +1,14 @@
 <?php
 
+use App\Http\Controllers\LandingPage\IndexController;
 use App\Http\Controllers\SubmissionController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('index');
+Route::controller(IndexController::class)->group(function () {
+    Route::get('/', 'index');
 });
+
+Route::get('/sendemail', [IndexController::class, 'sendEmail']);
 
 Route::prefix('housing-partners')->name('housing-partners.')->group(function () {
     Route::controller(SubmissionController::class)->group(function () {

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 
 class HeroImage extends Model
@@ -24,6 +25,13 @@ class HeroImage extends Model
             }
         });
 
-        
+        static::updating(function () {
+            Cache::forget('index-hero-image');
+        });
+
+        static::creating(function () {
+            Cache::forget('index-hero-image');
+        });
+
     }
 }
