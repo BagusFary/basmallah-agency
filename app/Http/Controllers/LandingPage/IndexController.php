@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\LandingPage;
 
 use App\Http\Controllers\Controller;
+use App\Mail\SendReferralCode;
 use App\Models\FAQ;
 use App\Models\HousingPartner;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class IndexController extends Controller
 {
@@ -65,5 +67,12 @@ class IndexController extends Controller
         } else {
             return abort(403);
         }
+    }
+
+    public function sendEmail()
+    {
+        return new SendReferralCode('Losinto', rand(100000, 999999), 'Wisdom Wagir');
+        Mail::to('losinto@gmail.com')->send(new SendReferralCode('Losinto', rand(100000, 999999), 'Wisdom Wagir'));
+        return abort(403);
     }
 }

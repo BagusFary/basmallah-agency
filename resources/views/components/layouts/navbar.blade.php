@@ -1,6 +1,6 @@
-<nav
-    class="navbar transition bg-white text-black shadow-vintage-brem border-vintage dark:bg-vintage-brem duration-500 ease-in-out z-50 drop-shadow-md dark:shadow-light dark:text-white">
-    <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+<header
+    class="navbar sticky md:fixed top-0 -mt-1 w-full h-auto transition bg-white text-black shadow-vintage-brem border-vintage dark:bg-vintage-brem duration-500 ease-in-out z-40 drop-shadow-md dark:shadow-light dark:text-white">
+    <div class="max-w-screen-xl h-full flex flex-wrap items-center justify-between mx-auto p-4">
         <a href="/" class="flex items-center space-x-3 rtl:space-x-reverse">
             <span class="self-center text-2xl text-vintage-dark font-semibold whitespace-nowrap dark:text-white">
                 <img class="w-32 h-14 object-cover" src="{{ asset('basmallah-agency-icon.png') }}" alt="">
@@ -40,4 +40,4 @@
             </ul>
         </div>
     </div>
-</nav>
+</header>

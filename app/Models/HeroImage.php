@@ -28,5 +28,9 @@ class HeroImage extends Model
         static::updating(function () {
             Cache::forget('index-hero-image');
         });
+
+        static::creating(function () {
+            Cache::forget('index-hero-image');
+        });
     }
 }

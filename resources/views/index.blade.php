@@ -7,8 +7,6 @@
 
 
 @section('content')
-    @extends('components.layouts.navbar')
-
     <section id="container" class="transition bg-cover ease-in-out bg-center bg-no-repeat bg-vintage-brem bg-blend-multiply"
         style="background-image: url('{{ $heroImage }}')">
         <div class="px-4 mx-auto max-w-screen-xl text-center py-24 lg:py-56">
@@ -61,8 +59,7 @@
                 </p>
             </div>
             <div class="hidden md:col-span-5 md:mt-0 md:flex">
-                <img class="dark:hidden" src="{{ asset('Hero Images.png') }}"
-                    alt="shopping illustration" />
+                <img class="dark:hidden" src="{{ asset('Hero Images.png') }}" alt="shopping illustration" />
             </div>
         </div>
         <div class="grid gap-3">
@@ -144,30 +141,33 @@
                                 src="{{ asset("storage/$house->image_url") }}" alt="Bonnie Avatar">
                         </div>
                         <div class="">
-                            <div class="px-3 flex flex-col gap-1.5 self-stretch h-full">
+                            <div class="px-3 flex flex-col gap-3 self-stretch h-full">
                                 <h3 class="text-xl font-bold">
                                     <h1 class="font-bold text-lg text-vintage-dark dark:text-white md:text-2xl">
                                         {{ $house->name }}
                                     </h1>
                                 </h3>
-                                <div class="inline-flex items-center">
-                                    <span
-                                        class="text-white bg-vintage-dark border border-vintage-dark font-medium px-2.5 py-0.5 dark:bg-green-900 dark:text-green-300">DP
-                                        {{ $house->down_payment }}%</span>
-                                    <p
-                                        class="font-light bg-white text-vintage-dark border border-vintage-dark px-2.5 py-0.5 dark:text-white">
-                                        Tersisa <span class="font-semibold">
-                                            {{ \Number::format($house->available, locale: 'id') }}</span>
+                                <div class="grid">
+                                    <div class="inline-flex items-center">
+                                        <span
+                                            class="text-white bg-vintage-dark border border-vintage-dark font-medium px-2.5 py-0.5 dark:bg-green-900 dark:text-green-300">DP
+                                            {{ $house->down_payment }}%</span>
+                                        <p
+                                            class="font-light bg-white text-vintage-dark border border-vintage-dark px-2.5 py-0.5 dark:text-white">
+                                            Tersisa <span class="font-semibold">
+                                                {{ \Number::format($house->available, locale: 'id') }}</span>
+                                        </p>
+                                    </div>
+                                    <p class="font-light text-black dark:text-white mb-5">
+                                        Booking Fee <span class="font-semibold">Rp.
+                                            {{ \Number::format($house->booking_fee, locale: 'id') }}</span>
                                     </p>
                                 </div>
-                                <p class="font-light text-black dark:text-white">
-                                    Booking Fee <span class="font-semibold">Rp.
-                                        {{ \Number::format($house->booking_fee, locale: 'id') }}</span>
-                                </p>
+
 
 
                                 <div class="mt-auto mb-5">
-                                    <a href=""
+                                    <a href="/housing-partners/{{ $house->id }}/submission"
                                         class="border-2 font-bold text-vintage-dark hover:bg-vintage-dark hover:text-white border px-3 py-2 border-vintage-dark bg-transparent">
                                         Daftar Sekarang
                                     </a>
@@ -238,7 +238,7 @@
             </div>
 
             <div class="mt-6 flow-root">
-                <div id="content-faq" class="-my-6 divide-y divide-vintage-dark dark:divide-gray-800">
+                <div id="content-faq" class="-my-6 divide-y divide-white dark:divide-gray-800">
                     @foreach ($faqs->items() as $faq)
                         <div class="space-y-4 py-6 md:py-8">
                             <div class="grid gap-4">
@@ -257,7 +257,7 @@
                 <div id="{{ $faqs->nextCursor()->encode() }}"
                     class="next-button mt-6 flex items-center justify-center lg:justify-start">
                     <button id="btn-next-button" type="button"
-                        class="w-full rounded-lg  bg-vintage-dark px-5 py-2.5 text-sm font-medium text-white hover:bg-vintage-brem hover:text-white hover:bg-vintage-cream dark:hover:bg-vintage-light focus:z-10 focus:outline-none focus:ring-4 focus:ring-vintage-light dark:bg-vintage-cream dark:text-black sm:w-auto">
+                        class="w-full rounded-lg  bg-white px-5 py-2.5 text-sm font-medium text-vintage-dark sm:w-auto">
                         Lihat Banyak
                     </button>
                 </div>
@@ -265,14 +265,14 @@
 
         </div>
         <footer class="mt-4 bg-vintage-dark">
-            <div class="w-full max-w-screen-xl mx-auto md:py-8">
+            <div class="w-full max-w-screen-xl mx-3 md:mx-auto md:py-8">
                 <div class="sm:flex sm:items-center sm:justify-between">
                     <a href="https://flowbite.com/" class="flex items-center mb-4 sm:mb-0 space-x-3 rtl:space-x-reverse">
-                        <span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">Basmallah
+                        <span
+                            class="self-center uppercase text-white text-2xl font-bold whitespace-nowrap dark:text-white">Basmallah
                             Agency</span>
                     </a>
-                    <ul
-                        class="flex flex-wrap items-center mb-6 text-sm font-medium text-gray-500 sm:mb-0 dark:text-gray-400">
+                    <ul class="flex flex-wrap items-center mb-6 text-sm font-medium text-white sm:mb-0 dark:text-gray-400">
                         <li>
                             <a href="#" class="hover:underline me-4 md:me-6">basmallahagency@gmail.com</a>
                         </li>
@@ -281,8 +281,8 @@
                         </li>
                     </ul>
                 </div>
-                <hr class="my-6 border-vintage-dark sm:mx-auto dark:border-gray-700 lg:my-8" />
-                <span class="block text-sm text-gray-500 sm:text-center dark:text-gray-400">©
+                <hr class="my-6 border-white sm:mx-auto dark:border-gray-700 lg:my-8" />
+                <span class="block text-sm text-white sm:text-center dark:text-gray-400">©
                     {{ \Carbon\Carbon::now()->format('Y') }} <a href="https://flowbite.com/"
                         class="hover:underline">Lastation™</a>. All Rights Reserved.</span>
             </div>
