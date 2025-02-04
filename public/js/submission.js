@@ -3,14 +3,12 @@ $("input[name='employment_status']").on("change", checkEmployementStatus);
 $("input[name='salary']").on("change", checkIncomeStatus);
 $("input[name='has_instalment']").on("change", checkInstalmentStatus);
 
-$("#join_husband, #join_wife_input").on("input", function (event) {
-    // console.log(event);
+$("#join_husband_input, #join_wife_input").on("input", function (event) {
     validatePriceInput(event);
     updateTotalIncome();
 });
 
 $('#self_income_input, #avg_monthly_turnover_input, #instalment_amount_input').on("input", function(event){
-    // console.log(event);
     validatePriceInput(event);
 })
 
@@ -41,7 +39,7 @@ function checkEmployementStatus(){
 }
 
 function clearJointIncomeInput(){
-    $("#join_husband").val("");
+    $("#join_husband_input").val("");
     $("#join_wife_input").val("");
     $("#total_joint").text("Rp.0");
 
@@ -93,10 +91,10 @@ function validatePriceInput(event) {
         input.val("Rp. 0")
     }
 
-    // $('#' + input.id).val(numericValue).trigger('input');
 
-    // set real input data
-    let target = input.id;
+    // Set data to hidden input
+    let inputId = input[0].attributes[3].nodeValue;
+    let target = inputId.replace('_input','');
     $('#' + target).val(numericValue);
 }
 
@@ -106,7 +104,7 @@ function validatePhoneInput(event) {
 }
 
 function updateTotalIncome() {
-    let husbandIncome = parseInt($("#join_husband").val().replace(/\D/g, "")) || 0;
+    let husbandIncome = parseInt($("#join_husband_input").val().replace(/\D/g, "")) || 0;
     let wifeIncome = parseInt($("#join_wife_input").val().replace(/\D/g, "")) || 0;
     let totalIncome = husbandIncome + wifeIncome;
     $("#total_joint").text("Rp." + totalIncome.toLocaleString("id-ID"));
