@@ -24,6 +24,12 @@ class UserSubmission extends Model
         return $this->belongsTo(HousingPartner::class, 'housing_partner_id', 'id');
     }
 
+
+    /**
+     * Get the user that owns the UserSubmission
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function user_submission(): BelongsTo
     {
         return $this->belongsTo(HousingPartner::class, 'housing_partner_id', 'id');
