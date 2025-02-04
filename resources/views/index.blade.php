@@ -5,6 +5,7 @@
 @section('description', 'Basmallah Agency merupakan Agen Properti yang sudah berjalan lama')
 
 
+    
 @section('content')
     @extends('components.layouts.navbar')
 
