@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta property="og:title" content="Basmallah Agency | Agen Properti Handal">
+    <meta property="og:title" content="Basmallah Agency | Providing Liveable with Good Deal">
     <title>@yield('title')</title>
     {{-- <description>@yield('description')</description> --}}
 
@@ -1211,8 +1211,21 @@
     @endif
 </head>
 
-<body class="font-sans antialiased dark:bg-gray-900 dark:text-white/50">
-    @yield('content')
+
+
+<body
+    class="font-sans overflow-auto transition ease-in-out antialiased bg-vintage-light dark:bg-vintage-dark dark:text-white/50 relative">
+    @include('components.layouts.navbar')
+
+    <div id="loading-state" class="absolute z-50 top-0 flex justify-center items-center bg-white w-screen h-screen">
+        <div class="">
+            <img src="{{ asset('basmallah-agency-icon.png') }}" class="scale-25" alt="">
+        </div>
+    </div>
+
+    <section id="body-content" class="relative hidden">
+        @yield('content')
+    </section>
 
 
     <script src="{{ asset('js/jquery-3.7.1.min.js') }}"></script>
