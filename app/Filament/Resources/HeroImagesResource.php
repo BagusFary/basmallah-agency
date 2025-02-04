@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\HeroImagesResource\Pages;
 use App\Models\HeroImage;
+use Cache;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Form;
@@ -13,6 +14,7 @@ use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
+use Storage;
 use Symfony\Component\Uid\Ulid;
 
 class HeroImagesResource extends Resource
@@ -34,6 +36,13 @@ class HeroImagesResource extends Resource
                         $fileExtension = $file->getClientOriginalExtension();
                         $hashedName = md5($timestamp . Ulid::generate());
                         return (string) "heroImages/{$hashedName}.{$fileExtension}";
+                    })
+                    ->required()
+                    ->afterStateUpdated(function ($state, $record) {
+                        $storageImage = Storage::disk('filament_disk');
+                        if(isset($record->image_url) && $state){
+                            $storageImage->delete($record->image_url);
+                        }
                     }),
                 Hidden::make('user_id')
                     ->default(Auth::user()->id)
@@ -45,7 +54,7 @@ class HeroImagesResource extends Resource
         return $table
             ->columns([
                 ImageColumn::make('image_url')
-                    ->label('Gambar')
+                    ->label('Gambar'),
             ])
             ->filters([
                 //

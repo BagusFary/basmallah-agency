@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -31,6 +32,11 @@ class HousingPartner extends Model
                 $filamentStorage->delete($housingPartner->image_url);
             }
         });
+    }
+
+    public function userSubmission(): HasMany
+    {
+        return $this->hasMany(UserSubmission::class, 'housing_partner_id', 'id');
     }
 
     public function user(): BelongsTo

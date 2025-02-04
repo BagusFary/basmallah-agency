@@ -14,4 +14,9 @@ class CreateUser extends CreateRecord
         // dd($data);
         return $data;
     }
+
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
+    }
 }

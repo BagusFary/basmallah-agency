@@ -23,5 +23,7 @@ class HeroImage extends Model
                 $filamentStorage->delete($heroImage->image_url);
             }
         });
+
+        
     }
 }
