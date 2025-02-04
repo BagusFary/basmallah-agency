@@ -8621,11 +8621,7 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/phpunit/issues",
                 "security": "https://github.com/sebastianbergmann/phpunit/security/policy",
-<<<<<<< HEAD
                 "source": "https://github.com/sebastianbergmann/phpunit/tree/11.5.5"
-=======
-                "source": "https://github.com/sebastianbergmann/phpunit/tree/11.5.6"
->>>>>>> 7cf195b (Change Composer.Lock)
             },
             "funding": [
                 {
@@ -8641,11 +8637,7 @@
                     "type": "tidelift"
                 }
             ],
-<<<<<<< HEAD
             "time": "2025-01-29T14:01:11+00:00"
-=======
-            "time": "2025-01-31T07:03:30+00:00"
->>>>>>> 7cf195b (Change Composer.Lock)
         },
         {
             "name": "sebastian/cli-parser",
@@ -9756,10 +9748,6 @@
     "platform": {
         "php": "^8.2"
     },
-<<<<<<< HEAD
     "platform-dev": [],
-=======
-    "platform-dev": {},
->>>>>>> 7cf195b (Change Composer.Lock)
     "plugin-api-version": "2.6.0"
 }
