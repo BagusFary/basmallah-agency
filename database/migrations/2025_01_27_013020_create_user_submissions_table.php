@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('id_card', 50)->index();
             $table->text('address');
             $table->enum('employment_status', ['self_employees', 'civil_servants', 'employees'])->default('self_employees');
+            $table->string('self_employee_as');
             $table->integer('avg_monthly_turnover');
             $table->boolean('has_instalment');
             $table->integer('instalment_amount');
