@@ -22,6 +22,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\HousingPartnerResource\Pages;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use App\Filament\Resources\HousingPartnerResource\RelationManagers;
+use Storage;
 
 class HousingPartnerResource extends Resource
 {
@@ -34,7 +35,7 @@ class HousingPartnerResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Hidden::make('user_id')
-                    ->default(Auth::user()->id), 
+                    ->default(Auth::user()->id),
                 Forms\Components\TextInput::make('code')
                     ->label('Code')
                     ->required()
@@ -49,7 +50,13 @@ class HousingPartnerResource extends Resource
                         $hashedName = md5($timestamp);
                         return (string) "housingpartnerimage/{$hashedName}.{$fileExtension}";
                     })
-                    ->required(),
+                    ->required()
+                    ->afterStateUpdated(function ($state, $record) {
+                        $storageImage = Storage::disk('filament_disk');
+                        if (isset($record->image_url) && $state) {
+                            $storageImage->delete($record->image_url);
+                        }
+                    }),
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255),
@@ -98,35 +105,41 @@ class HousingPartnerResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('code')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('phone')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('email')
-                    ->searchable(),
+                // Tables\Columns\TextColumn::make('phone')
+                //     ->searchable(),
+                // Tables\Columns\TextColumn::make('email')
+                //     ->searchable(),
                 Tables\Columns\TextColumn::make('available')
                     ->numeric()
                     ->sortable()
                     ->formatStateUsing(function ($state) {
                         return $state == 0 ? 'Tidak Tersedia' : "{$state} Rumah";
                     }),
+                Tables\Columns\TextColumn::make('booking_fee')
+                    ->formatStateUsing(function ($state) {
+                        return "Rp. " . number_format($state, -3, ',', '.');
+                    }),
             ])
             ->filters([
                 Filter::make('available')
                     ->form([
                         TextInput::make('available_input')
-                        ->label('Rumah yang tersedia (Available)')
-                        ->numeric()
-                        ->minValue(0)
-                        ->default(0)
+                            ->label('Rumah yang tersedia (Available)')
+                            ->numeric()
+                            ->minValue(0)
+                            ->default(0)
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query->when(
                             $data['available_input'],
-                            fn (Builder $query, $input): Builder => $query->where('available', '==', $input)
+                            fn(Builder $query, $input): Builder => $query->where('available', '==', $input)
                         );
                     }),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make()
+                    ->requiresConfirmation(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
