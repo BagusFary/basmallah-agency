@@ -17,7 +17,10 @@ class CreateFaqs extends CreateRecord
         return __('Create FAQ');
     }
 
-    
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
+    }
 
 
 }

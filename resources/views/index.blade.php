@@ -4,8 +4,6 @@
 
 @section('description', 'Basmallah Agency merupakan Agen Properti yang sudah berjalan lama')
 
-
-
 @section('content')
     <section id="container" class="transition bg-cover ease-in-out bg-center bg-no-repeat bg-vintage-brem bg-blend-multiply"
         style="background-image: url('{{ $heroImage }}')">
