@@ -10,7 +10,6 @@ use Filament\Support\RawJs;
 use App\Models\UserSubmission;
 use App\Models\UserSubmissions;
 use Filament\Resources\Resource;
-use Filament\Actions\CreateAction;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Filters\Filter;
 use Illuminate\Support\Facades\Log;
@@ -21,12 +20,15 @@ use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Repeater;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\DatePicker;
+use Filament\Tables\Actions\CreateAction;
 use Filament\Tables\Actions\ExportAction;
 use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Exports\UserSubmissionExporter;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\UserSubmissionsResource\Pages;
+use Malzariey\FilamentDaterangepickerFilter\Fields\DateRangePicker;
 use App\Filament\Resources\UserSubmissionsResource\RelationManagers;
 
 class UserSubmissionsResource extends Resource
@@ -138,6 +140,46 @@ class UserSubmissionsResource extends Resource
             ->filters([
                 
             ])
+            ->headerActions([
+                Action::make('exportGlobal')
+                        ->label('Export Excel')
+                        ->icon('heroicon-m-folder-arrow-down')
+                        ->form([
+                            Section::make()
+                                ->schema([
+                                    Select::make('housing_partner_id')
+                                        ->label('Housing Partner')
+                                        ->relationship('housingPartner', 'name')
+                                        ->placeholder('Pilih Housing Partner')
+                                        ->required()
+                                        ->native(false),
+                                    DateRangePicker::make('created_at')
+                                        ->label('Rentang Tanggal')
+                                        ->placeholder('Pilih Rentang Tanggal')
+                                        ->required(),
+                                        Select::make('employemnt_status')
+                                        ->label('Status Pekerjaan')
+                                        ->placeholder('Pilih Status Pekerjaan')
+                                        ->options([
+                                            'self_employees' => 'Wirausaha',
+                                            'civil_servants' => 'PNS',
+                                            'employee' => 'Pegawai Swasta',
+                                        ])
+                                        ->native(false),
+                                    TextInput::make('avg_monthly_turnover')
+                                                ->label('Omset Rata - Rata Perbulan')
+                                                ->placeholder('Masukkan Omset Perbulan')
+                                                ->inputMode('numeric')
+                                                ->minValue(1)
+                                                ->numeric()
+                                ])
+                                ->columns(2)
+                        ])
+                        ->action(function(array $data){
+                            
+                        })
+                        
+            ])
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\Action::make('detail')
@@ -223,15 +265,8 @@ class UserSubmissionsResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
-            ])
-            ->headerActions([
-                CreateAction::make()
-                ->form([
-                    TextInput::make('title')
-                        ->required()
-                        ->maxLength(255),
-                ]),           
             ]);
+            
     }
 
     public static function getRelations(): array
