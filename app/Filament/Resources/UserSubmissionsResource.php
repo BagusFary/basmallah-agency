@@ -15,7 +15,9 @@ use Filament\Tables\Filters\Filter;
 use Illuminate\Support\Facades\Log;
 use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Radio;
+use Maatwebsite\Excel\Facades\Excel;
 use Filament\Forms\Components\Select;
+use App\Exports\UserSubmissionsExport;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Repeater;
 use Filament\Tables\Columns\TextColumn;
@@ -151,13 +153,11 @@ class UserSubmissionsResource extends Resource
                                         ->label('Housing Partner')
                                         ->relationship('housingPartner', 'name')
                                         ->placeholder('Pilih Housing Partner')
-                                        ->required()
                                         ->native(false),
                                     DateRangePicker::make('created_at')
                                         ->label('Rentang Tanggal')
-                                        ->placeholder('Pilih Rentang Tanggal')
-                                        ->required(),
-                                        Select::make('employemnt_status')
+                                        ->placeholder('Pilih Rentang Tanggal'),
+                                    Select::make('employment_status')
                                         ->label('Status Pekerjaan')
                                         ->placeholder('Pilih Status Pekerjaan')
                                         ->options([
@@ -165,18 +165,43 @@ class UserSubmissionsResource extends Resource
                                             'civil_servants' => 'PNS',
                                             'employee' => 'Pegawai Swasta',
                                         ])
-                                        ->native(false),
+                                        ->native(false)
+                                        ->live(),
                                     TextInput::make('avg_monthly_turnover')
-                                                ->label('Omset Rata - Rata Perbulan')
-                                                ->placeholder('Masukkan Omset Perbulan')
-                                                ->inputMode('numeric')
-                                                ->minValue(1)
-                                                ->numeric()
+                                        ->label('Omset Rata - Rata Perbulan')
+                                        ->placeholder('Masukkan Omset Perbulan')
+                                        ->inputMode('numeric')
+                                        ->minValue(0)
+                                        ->numeric()
+                                        ->prefix('Rp.')
+                                        ->mask(RawJs::make('$money($input)'))
+                                        ->stripCharacters(',')
+                                        ->visible(fn ($get) => $get('employment_status') === 'self_employees'),
+                                    Select::make('has_instalment')
+                                        ->label('Punya Cicilan')
+                                        ->placeholder('Apakah user memiliki cicilan ?')
+                                        ->options([
+                                            "1" => 'Ya', 
+                                            "0" => 'Tidak'
+                                        ])
+                                        ->native(false)
+                                        ->live(),
+                                    TextInput::make('instalment_amount')
+                                            ->label('Jumlah Cicilan')
+                                            ->placeholder('Masukkan Jumlah Cicilan')
+                                            ->inputMode('numeric')
+                                            ->minValue(1)
+                                            ->numeric()
+                                            ->prefix('Rp.')
+                                            ->mask(RawJs::make('$money($input)'))
+                                            ->stripCharacters(',')
+                                            ->visible(fn ($get) => $get('has_instalment') === "1" ),
+                                    
                                 ])
                                 ->columns(2)
                         ])
                         ->action(function(array $data){
-                            
+                            return Excel::download(new UserSubmissionsExport($data), 'RekapitulasiForm-' . now()->format('Ymd_His') . '.xlsx');
                         })
                         
             ])
