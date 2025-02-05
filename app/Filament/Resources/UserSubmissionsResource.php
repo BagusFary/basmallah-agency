@@ -3,14 +3,17 @@
 namespace App\Filament\Resources;
 
 use Filament\Forms;
-use Filament\Support\RawJs;
 use Filament\Tables;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Filament\Support\RawJs;
 use App\Models\UserSubmission;
 use App\Models\UserSubmissions;
 use Filament\Resources\Resource;
+use Filament\Actions\CreateAction;
 use Filament\Tables\Actions\Action;
+use Filament\Tables\Filters\Filter;
+use Illuminate\Support\Facades\Log;
 use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Select;
@@ -18,12 +21,13 @@ use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Repeater;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
+use Filament\Tables\Actions\ExportAction;
+use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Exports\UserSubmissionExporter;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\UserSubmissionsResource\Pages;
 use App\Filament\Resources\UserSubmissionsResource\RelationManagers;
-use Filament\Tables\Filters\Filter;
-use Filament\Tables\Filters\SelectFilter;
 
 class UserSubmissionsResource extends Resource
 {
@@ -85,7 +89,7 @@ class UserSubmissionsResource extends Resource
                         TextInput::make('salary')
                             ->numeric()
                     ])
-                    ->relationship('income')
+                    ->relationship('incomes')
                     ->defaultItems(1)
             ]);
     }
@@ -93,7 +97,7 @@ class UserSubmissionsResource extends Resource
     protected static function getIncome(UserSubmission $model)
     {
         $dynamicSchemaIncome = [];
-        foreach ($model->income as $income) {
+        foreach ($model->incomes as $income) {
             $dynamicSchemaIncome[] = TextInput::make("income_{$income->id}")
                 ->label(function () use ($income) {
                     $getType = $income->type;
@@ -138,7 +142,7 @@ class UserSubmissionsResource extends Resource
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\Action::make('detail')
                     ->form([
-                        Section::make(fn(UserSubmission $record): string => $record->housingPatner->name)
+                        Section::make(fn(UserSubmission $record): string => $record->housingPartner->name)
                             ->schema([
                                 TextInput::make('id_card')
                                     ->default(fn(UserSubmission $record): string => $record->id_card)
@@ -200,7 +204,7 @@ class UserSubmissionsResource extends Resource
                                     ->prefix('Rp.')
                                     ->mask(RawJs::make('$money($input)')),
                                 TextInput::make('type')
-                                    ->default(fn(UserSubmission $record): string => $record->income[0]->type === 'self' ? 'Pribadi' : 'Join Income')
+                                    ->default(fn(UserSubmission $record): string => $record->incomes[0]->type === 'self' ? 'Pribadi' : 'Join Income')
                                     ->readOnly()
                                     ->columnSpan(2)
                                     ->label('Tipe Penghasilan'),
@@ -213,14 +217,20 @@ class UserSubmissionsResource extends Resource
                                     ->columnSpan(2)
                                     ->schema(fn(UserSubmission $record) => $record ? static::getIncome($record) : []),
                             ])->columns(2)
-
-
-                    ])
+                        ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
+            ])
+            ->headerActions([
+                CreateAction::make()
+                ->form([
+                    TextInput::make('title')
+                        ->required()
+                        ->maxLength(255),
+                ]),           
             ]);
     }
 
