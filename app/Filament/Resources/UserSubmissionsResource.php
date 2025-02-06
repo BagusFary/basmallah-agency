@@ -20,6 +20,7 @@ use Filament\Forms\Components\Select;
 use App\Exports\UserSubmissionsExport;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Repeater;
+use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\DatePicker;
@@ -27,6 +28,7 @@ use Filament\Tables\Actions\CreateAction;
 use Filament\Tables\Actions\ExportAction;
 use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use App\Filament\Exports\UserSubmissionExporter;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\UserSubmissionsResource\Pages;
@@ -147,7 +149,7 @@ class UserSubmissionsResource extends Resource
                         ->label('Export Excel')
                         ->icon('heroicon-m-folder-arrow-down')
                         ->form([
-                            Section::make()
+                            Section::make('Filter Export User Submission')
                                 ->schema([
                                     Select::make('housing_partner_id')
                                         ->label('Housing Partner')
@@ -163,40 +165,99 @@ class UserSubmissionsResource extends Resource
                                         ->options([
                                             'self_employees' => 'Wirausaha',
                                             'civil_servants' => 'PNS',
-                                            'employee' => 'Pegawai Swasta',
+                                            'employees' => 'Pegawai Swasta',
                                         ])
                                         ->native(false)
                                         ->live(),
-                                    TextInput::make('avg_monthly_turnover')
-                                        ->label('Omset Rata - Rata Perbulan')
-                                        ->placeholder('Masukkan Omset Perbulan')
-                                        ->inputMode('numeric')
-                                        ->minValue(0)
-                                        ->numeric()
-                                        ->prefix('Rp.')
-                                        ->mask(RawJs::make('$money($input)'))
-                                        ->stripCharacters(',')
+                                        Section::make('Omset Rata - Rata Perbulan')
+                                        ->schema([
+                                            TextInput::make('avg_turnover_min')
+                                            ->label('Minimal')
+                                            ->placeholder('Masukkan Omset Minimal')
+                                            ->inputMode('numeric')
+                                            ->minValue(0)
+                                            ->numeric()
+                                            ->prefix('Rp.')
+                                            ->mask(RawJs::make('$money($input)'))
+                                            ->stripCharacters(','),
+                                            TextInput::make('avg_turnover_max')
+                                            ->label('Maksimal')
+                                            ->placeholder('Masukkan Omset Maksimal')
+                                            ->inputMode('numeric')
+                                            ->minValue(0)
+                                            ->numeric()
+                                            ->prefix('Rp.')
+                                            ->mask(RawJs::make('$money($input)'))
+                                            ->stripCharacters(',')
+                                            ->gt('avg_turnover_min'),
+                                        ])
+                                        ->columns(2)
                                         ->visible(fn ($get) => $get('employment_status') === 'self_employees'),
                                     Select::make('has_instalment')
                                         ->label('Punya Cicilan')
-                                        ->placeholder('Apakah user memiliki cicilan ?')
+                                        ->placeholder('Apakah user memiliki cicilan?')
                                         ->options([
                                             "1" => 'Ya', 
                                             "0" => 'Tidak'
                                         ])
                                         ->native(false)
                                         ->live(),
-                                    TextInput::make('instalment_amount')
-                                            ->label('Jumlah Cicilan')
-                                            ->placeholder('Masukkan Jumlah Cicilan')
+                                        Section::make('Jumlah Cicilan')
+                                        ->schema([
+                                            TextInput::make('instalment_amount_min')
+                                            ->label('Minimal')
+                                            ->placeholder('Masukkan Minimal Cicilan')
                                             ->inputMode('numeric')
-                                            ->minValue(1)
+                                            ->minValue(0)
+                                            ->numeric()
+                                            ->prefix('Rp.')
+                                            ->mask(RawJs::make('$money($input)'))
+                                            ->stripCharacters(','),
+                                            TextInput::make('instalment_amount_max')
+                                            ->label('Maksimal')
+                                            ->placeholder('Masukkan Maksimal Cicilan')
+                                            ->inputMode('numeric')
+                                            ->minValue(0)
                                             ->numeric()
                                             ->prefix('Rp.')
                                             ->mask(RawJs::make('$money($input)'))
                                             ->stripCharacters(',')
-                                            ->visible(fn ($get) => $get('has_instalment') === "1" ),
-                                    
+                                            ->gt('instalment_amount_min'),
+                                        ])
+                                        ->columns(2)
+                                        ->visible(fn ($get) => $get('has_instalment') === '1'),
+                                        Select::make('income_type')
+                                        ->label('Tipe Penghasilan')
+                                        ->placeholder('Pilih Tipe Penghasilan')
+                                        ->options([
+                                            'Self Income' => 'Pribadi',
+                                            'Joint Income' => 'Joint Income'
+                                        ])
+                                        ->native(false)
+                                        ->live(),
+                                        Section::make('Penghasilan')
+                                        ->schema([
+                                            TextInput::make('salary_min')
+                                            ->label('Minimal')
+                                            ->placeholder('Masukkan Minimal Penghasilan')
+                                            ->inputMode('numeric')
+                                            ->minValue(0)
+                                            ->numeric()
+                                            ->prefix('Rp.')
+                                            ->mask(RawJs::make('$money($input)'))
+                                            ->stripCharacters(','),
+                                            TextInput::make('salary_max')
+                                            ->label('Maksimal')
+                                            ->placeholder('Masukkan Maksimal Penghasilan')
+                                            ->inputMode('numeric')
+                                            ->minValue(0)
+                                            ->numeric()
+                                            ->prefix('Rp.')
+                                            ->mask(RawJs::make('$money($input)'))
+                                            ->stripCharacters(',')
+                                            ->gt('salary_min'),
+                                        ])
+                                        ->columns(2)
                                 ])
                                 ->columns(2)
                         ])
@@ -289,6 +350,18 @@ class UserSubmissionsResource extends Resource
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                    BulkAction::make('exportBulk')
+                    ->requiresConfirmation()
+                    ->label('Export Excel')
+                    ->icon('heroicon-m-folder-arrow-down')
+                    ->action(function (Collection $records){
+
+                        $data = [
+                            'user_submission_id' => $records->pluck('id')
+                        ];
+
+                        return Excel::download(new UserSubmissionsExport($data), 'RekapitulasiForm-' . now()->format('Ymd_His') . '.xlsx');
+                    })
                 ]),
             ]);
             
