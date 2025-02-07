@@ -115,8 +115,6 @@ class UserSubmissionsExport implements FromCollection, WithMapping, WithHeadings
                 break;
         }
 
-        $type = $submission->income_type;
-
         return [
             $submission->referral_code,
             $submission->housing_partner_name,
