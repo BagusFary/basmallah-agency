@@ -29,7 +29,7 @@ class UserSubmissionsExport implements FromCollection, WithMapping, WithHeadings
     {
         $data = DB::table('user_submissions_view')
                         ->when(isset($this->request['user_submission_id']), function (Builder $query) {
-                            $query->whereIn('id', $this->request['user_submission_id']);
+                            $query->whereIn('user_submission_id', $this->request['user_submission_id']);
                         })
                         ->when(isset($this->request['housing_partner_id']), function (Builder $query) {
                             $query->where('housing_partner_id', $this->request['housing_partner_id']);
@@ -48,8 +48,8 @@ class UserSubmissionsExport implements FromCollection, WithMapping, WithHeadings
                         })
                         ->when(isset($this->request['created_at']), function (Builder $query) {
                             $dates = explode(' - ', $this->request['created_at']);
-                            $startDate = \Carbon\Carbon::createFromFormat('d/m/Y', trim($dates[0]));
-                            $endDate = \Carbon\Carbon::createFromFormat('d/m/Y', trim($dates[1]));
+                            $startDate = \Carbon\Carbon::createFromFormat('d/m/Y', trim($dates[0]))->startOfDay();
+                            $endDate = \Carbon\Carbon::createFromFormat('d/m/Y', trim($dates[1]))->endOfDay();
                             $query->whereBetween('created_at', [$startDate, $endDate]);
                         })
                         ->when(isset($this->request['income_type']), function (Builder $query) {
