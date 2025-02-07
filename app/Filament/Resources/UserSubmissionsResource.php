@@ -138,7 +138,7 @@ class UserSubmissionsResource extends Resource
 
             ])
             ->filters([
-                Filter::make('income.salary')
+                Filter::make('incomes.salary')
                     ->form([
                         Section::make('Penghasilan')
                             ->collapsible()
@@ -205,12 +205,12 @@ class UserSubmissionsResource extends Resource
                             // dd($minSalary);
                             $query
                             ->when($minSalary ?? null, function ($query, $minSalary) {
-                                return $query->whereHas('income', function ($q) use ($minSalary) {
+                                return $query->whereHas('incomes', function ($q) use ($minSalary) {
                                     $q->where('salary', '>=', $minSalary);
                                 });
                             })
                             ->when($maxSalary ?? null, function ($query, $maxSalary) {
-                                return $query->whereHas('income', function ($q) use ($maxSalary) {
+                                return $query->whereHas('incomes', function ($q) use ($maxSalary) {
                                     $q->selectRaw('SUM(salary) as total_salary')->having('total_salary', '<=', $maxSalary);
                                 });
                             })
@@ -219,9 +219,10 @@ class UserSubmissionsResource extends Resource
                             })
                             ->when($maxCicilan ?? null, function ($query, $maxCicilan) {
                                 return $query->where('instalment_amount', '<=', $maxCicilan);
-                            })
+                            });
+                    })
+            ])
             ->deferLoading()
-            ->filters([])
             ->headerActions([
                 Action::make('exportGlobal')
                     ->label('Export Excel')
