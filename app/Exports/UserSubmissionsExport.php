@@ -2,7 +2,7 @@
 
 namespace App\Exports;
 
-use App\Models\UserSubmission;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use PhpOffice\PhpSpreadsheet\Style\Border;
@@ -10,7 +10,6 @@ use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
-use Illuminate\Contracts\Database\Query\Builder;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class UserSubmissionsExport implements FromCollection, WithMapping, WithHeadings, WithStyles, ShouldAutoSize
@@ -97,7 +96,7 @@ class UserSubmissionsExport implements FromCollection, WithMapping, WithHeadings
             case 'self_employees':
                 $employmentStatus = 'Wirausaha';
                 break;
-            case 'civil_servant':
+            case 'civil_servants':
                 $employmentStatus = 'PNS';
                 break;
             case 'employees':
@@ -115,6 +114,8 @@ class UserSubmissionsExport implements FromCollection, WithMapping, WithHeadings
                 $hasInstalment = 'Ada';
                 break;
         }
+
+        $type = $submission->income_type;
 
         return [
             $submission->referral_code,
