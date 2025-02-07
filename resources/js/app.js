@@ -48,8 +48,9 @@ const fetchingFAQ = () => {
 };
 
 function startLoadingState() {
-    $("#loading-state").fadeOut(1000);
-    $("#body-content").fadeIn(1000);
+    if ($("#loading-state").length) {
+        $("#loading-state").fadeOut(1000).delay(500);
+    }
 }
 
 $(document).ready(function () {
@@ -58,4 +59,70 @@ $(document).ready(function () {
     $("#btn-next-button").click(() => {
         fetchingFAQ();
     });
+
+    // Create a timeline
+    let tl = gsap.timeline({
+        delay: 0.5,
+        paused: false, // default is false
+        repeat: -1, // number of repeats (-1 for infinite)
+        repeatDelay: 0, // seconds between repeats
+        repeatRefresh: true, // invalidates on each repeat
+        yoyo: true, // if true > A-B-B-A, if false > A-B-A-B
+        yoyoEase: true,
+        defaults: {
+            // children inherit these defaults
+            duration: 1,
+            ease: "power1.inOut",
+        },
+    });
+
+    let tl2 = gsap.timeline({
+        delay: 0.8,
+        paused: false, // default is false
+        repeat: -1, // number of repeats (-1 for infinite)
+        repeatDelay: 0, // seconds between repeats
+        repeatRefresh: true, // invalidates on each repeat
+        yoyo: true, // if true > A-B-B-A, if false > A-B-A-B
+        yoyoEase: true,
+        defaults: {
+            // children inherit these defaults
+            duration: 1,
+            ease: "power1.inOut",
+        },
+    });
+
+    let tl3 = gsap.timeline({
+        delay: 1,
+        paused: false, // default is false
+        repeat: -1, // number of repeats (-1 for infinite)
+        repeatDelay: 0, // seconds between repeats
+        repeatRefresh: true, // invalidates on each repeat
+        yoyo: true, // if true > A-B-B-A, if false > A-B-A-B
+        yoyoEase: true,
+        defaults: {
+            // children inherit these defaults
+            duration: 1,
+            ease: "power1.inOut",
+        },
+    });
+
+    tl.to("#souvenir-1", {
+        y: 10,
+    });
+
+    tl2.to("#souvenir-2", {
+        y: 10,
+    });
+
+    tl3.to("#souvenir-3", {
+        y: 10,
+    });
+
+    // tl2.to("#text-souvenir-1", {
+    //     scale: 1.1,
+    // });
+
+    // tl2.to("#text-souvenir-2", {
+    //     scale: 1.1,
+    // });
 });
