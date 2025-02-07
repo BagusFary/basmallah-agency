@@ -24,6 +24,10 @@ use App\Models\Income;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Collection;
 use App\Filament\Resources\UserSubmissionsResource\Pages;
+use App\Filament\Resources\UserSubmissionsResource\RelationManagers;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\Indicator;
+use Filament\Tables\Filters\SelectFilter;
 use Malzariey\FilamentDaterangepickerFilter\Fields\DateRangePicker;
 
 class UserSubmissionsResource extends Resource
@@ -133,6 +137,89 @@ class UserSubmissionsResource extends Resource
                     ->label('Alamat')
 
             ])
+            ->filters([
+                Filter::make('income.salary')
+                    ->form([
+                        Section::make('Penghasilan')
+                            ->collapsible()
+                            ->collapsed()
+                            ->schema([
+                                TextInput::make('minSalary')
+                                    ->label('Minimal Penghasilan')
+                                    ->numeric()
+                                    ->prefix('Rp.')
+                                    ->mask(RawJs::make('$money($input)')),
+                                TextInput::make('maxSalary')
+                                    ->label('Maksimal Penghasilan')
+                                    ->numeric()
+                                    ->prefix('Rp.')
+                                    ->mask(RawJs::make('$money($input)'))
+                            ]),
+                        Section::make('Cicilan')
+                            ->collapsible()
+                            ->collapsed()
+                            ->schema([
+                                TextInput::make('minCicilan')
+                                    ->label('Minimal Cicilan')
+                                    ->numeric()
+                                    ->prefix('Rp.')
+                                    ->mask(RawJs::make('$money($input)')),
+                                TextInput::make('maxCicilan')
+                                    ->label('Maksimal Cicilan')
+                                    ->numeric()
+                                    ->prefix('Rp.')
+                                    ->mask(RawJs::make('$money($input)'))
+                            ])
+                    ])
+                    ->indicateUsing(function (array $data): array {
+                        $indicator = [];
+
+                        if ($data['minSalary'] ?? null) {
+                            $indicator[] = Indicator::make('Minimal Penghasilan: Rp. ' .  $data['minSalary'])
+                                ->removeField('minSalary');
+                        }
+
+                        if ($data['maxSalary'] ?? null) {
+                            $indicator[] = Indicator::make('Maksimal Penghasilan: Rp. ' . $data['maxSalary'])
+                                ->removeField('maxSalary');
+                        }
+
+                        if ($data['minCicilan'] ?? null) {
+                            $indicator[] = Indicator::make('Minimal Cicilan: Rp. ' . $data['minCicilan'])
+                                ->removeField('minCicilan');
+                        }
+
+                        if ($data['maxCicilan'] ?? null) {
+                            $indicator[] = Indicator::make('Maksimal Cicilan: Rp. ' . $data['maxCicilan'])
+                                ->removeField('maxCicilan');
+                        }
+
+                        return $indicator;
+                    })
+                    ->query(function (Builder $query, array $data) {
+                        $minSalary = str_replace([','], '', $data['minSalary'] ?? null);
+                        $maxSalary = str_replace([','], '', $data['maxSalary'] ?? null);
+                        $minCicilan = str_replace([','], '', $data['minCicilan'] ?? null);
+                        $maxCicilan = str_replace([','], '', $data['maxCicilan'] ?? null);
+                        return
+                            // dd($minSalary);
+                            $query
+                            ->when($minSalary ?? null, function ($query, $minSalary) {
+                                return $query->whereHas('income', function ($q) use ($minSalary) {
+                                    $q->where('salary', '>=', $minSalary);
+                                });
+                            })
+                            ->when($maxSalary ?? null, function ($query, $maxSalary) {
+                                return $query->whereHas('income', function ($q) use ($maxSalary) {
+                                    $q->selectRaw('SUM(salary) as total_salary')->having('total_salary', '<=', $maxSalary);
+                                });
+                            })
+                            ->when($minCicilan ?? null, function ($query, $minCicilan) {
+                                return $query->where('instalment_amount', '>=', $minCicilan);
+                            })
+                            ->when($maxCicilan ?? null, function ($query, $maxCicilan) {
+                                return $query->where('instalment_amount', '<=', $maxCicilan);
+                            })
             ->deferLoading()
             ->filters([])
             ->headerActions([
@@ -330,9 +417,9 @@ class UserSubmissionsResource extends Resource
 
                                 Repeater::make('Income')
                                     ->label('Penghasilan')
-                                    ->disableItemDeletion()
-                                    ->disableItemCreation()
-                                    ->disableItemMovement()
+                                    ->deletable(false)
+                                    ->addable(false)
+                                    ->reorderable(false)
                                     ->columnSpan(2)
                                     ->schema(fn(UserSubmission $record) => $record ? static::getIncome($record) : []),
                             ])->columns(2)
