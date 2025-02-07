@@ -2,16 +2,12 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Forms;
 use Filament\Support\RawJs;
 use Filament\Tables;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use App\Models\UserSubmission;
-use App\Models\UserSubmissions;
 use Filament\Resources\Resource;
-use Filament\Tables\Actions\Action;
-use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Section;
@@ -19,11 +15,14 @@ use Filament\Forms\Components\Repeater;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\UserSubmissionsResource\Pages;
-use App\Filament\Resources\UserSubmissionsResource\RelationManagers;
+use App\Models\HousingPartner;
+use App\Models\Income;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class UserSubmissionsResource extends Resource
 {
@@ -40,15 +39,15 @@ class UserSubmissionsResource extends Resource
                     ->native(false)
                     ->label('Perumahan'),
                 TextInput::make('email')
-                ->label('Email'),
+                    ->label('Email'),
                 TextInput::make('phone')
-                ->label('No Whatsapp'),
+                    ->label('No Whatsapp'),
                 TextInput::make('name')
-                ->label('Nama'),
+                    ->label('Nama'),
                 TextInput::make('id_card')
-                ->label('NIK'),
+                    ->label('NIK'),
                 TextInput::make('address')
-                ->label('Alamat'),
+                    ->label('Alamat'),
                 Select::make('employment_status')
                     ->options([
                         'self_employees' => 'Wirausaha',
@@ -67,11 +66,11 @@ class UserSubmissionsResource extends Resource
                     ])
                     ->label('Punya Cicilan?'),
                 TextInput::make('instalment_amount')
-                ->label('Jumlah Cicilan'),
+                    ->label('Jumlah Cicilan'),
                 TextInput::make('referral_code')
-                ->label('Kode Referal'),
+                    ->label('Kode Referal'),
                 Repeater::make('Income')
-                ->label('Penghasilan')
+                    ->label('Penghasilan')
                     ->schema([
                         Select::make('type')
                             ->options([
@@ -116,13 +115,14 @@ class UserSubmissionsResource extends Resource
     {
 
         return $table
+            ->modifyQueryUsing(fn(Builder $query) => $query->latest())
             ->columns([
                 TextColumn::make('housingPartner.name')
                     ->label('Perumahan')
                     ->searchable(),
                 TextColumn::make('id_card')
                     ->label('NIK')
-                    ->searchable(['email','address', 'phone', 'name', 'id_card', ]),
+                    ->searchable(['email', 'address', 'phone', 'name', 'id_card',]),
                 TextColumn::make('name')
                     ->label('Nama'),
                 TextColumn::make('email')
@@ -131,9 +131,8 @@ class UserSubmissionsResource extends Resource
                     ->label('Alamat')
 
             ])
-            ->filters([
-                
-            ])
+            ->deferLoading()
+            ->filters([])
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\Action::make('detail')
@@ -219,9 +218,26 @@ class UserSubmissionsResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->requiresConfirmation()
+                        ->action(function (Collection $records) {
+                            $ids = $records->pluck('id');
+                            $housePartnerIds = $records->pluck('housing_partner_id')->toArray();
+                            $bulkData = array_count_values($housePartnerIds);
+
+                            foreach ($bulkData as $housingPartnerId => $count) {
+                                HousingPartner::where('id', $housingPartnerId)->increment('available', $count);
+                            }
+
+                            // HousingPartner::whereIn('id', $housePartnerIds)->increment('available');
+                            Income::whereIn('user_submission_id', $ids)->delete();
+                            UserSubmission::whereIn('id', $ids)->delete();
+                        })
+                        ->after(fn() => Cache::forget('index-housing-list'))
+                        ->deselectRecordsAfterCompletion(),
                 ]),
-            ]);
+            ])
+            ->paginated([10, 25, 50, 100]);
     }
 
     public static function getRelations(): array

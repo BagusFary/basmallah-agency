@@ -12,7 +12,10 @@ Route::get('/sendemail', [IndexController::class, 'sendEmail']);
 
 Route::prefix('housing-partners')->name('housing-partners.')->group(function () {
     Route::controller(SubmissionController::class)->group(function () {
-        Route::get('/{id}/submission', 'create')->name('create');
-        Route::post('/{id}/submission', 'store')->name('store');
+        Route::prefix('{id}')->group(function() {
+            Route::get('/submission', 'create')->name('create');
+            Route::post('/submission', 'store')->name('store');
+            Route::get('/submission/complete', 'completeSubmission');
+        });
     });
 });

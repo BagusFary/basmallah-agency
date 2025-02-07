@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" prefix="og: https://ogp.me/ns#" class="scroll-smooth">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" prefix="og: https://ogp.me/ns#"
+    class="scroll-smooth overflow-x-hidden">
 
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta property="og:title" content="Basmallah Agency | Providing Liveable with Good Deal">
     <title>@yield('title')</title>
-    {{-- <description>@yield('description')</description> --}}
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -1214,25 +1214,29 @@
 
 
 <body
-    class="font-sans overflow-auto transition ease-in-out antialiased bg-vintage-light dark:bg-vintage-dark dark:text-white/50 relative">
+    class="font-sans m-0 transition ease-in-out antialiased bg-vintage-light dark:bg-vintage-dark dark:text-white/50 relative">
     @include('components.layouts.navbar')
 
-    <div id="loading-state" class="absolute z-50 top-0 flex justify-center items-center bg-white w-screen h-screen">
-        <div class="">
-            <img src="{{ asset('basmallah-agency-icon.png') }}" class="scale-25" alt="">
+    @if (Request::is('/'))
+        <div id="loading-state"
+            class="fixed z-50 top-0 left-0 flex justify-center items-center bg-white min-h-[100%] w-[100%]">
+            <div class="">
+                <img src="{{ asset('basmallah-agency-icon.png') }}" class="scale-25" alt="">
+            </div>
         </div>
-    </div>
+    @endif
 
-    <section id="body-content" class="relative hidden">
+    <section id="body-content" class="relative min-h-svh @yield('body-class')">
         @yield('content')
     </section>
 
+    @include('components.layouts.footer')
+
 
     <script src="{{ asset('js/jquery-3.7.1.min.js') }}"></script>
-    <script src="{{ asset('js/dark-switcher.js') }}"></script>
 
-    
     @stack('scripts')
 </body>
+
 
 </html>
