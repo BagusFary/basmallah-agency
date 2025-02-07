@@ -17,11 +17,6 @@ class UserSubmission extends Model
     protected $primary_key = 'id';
     protected $guarded = ['id'];
 
-    public function income(): HasMany
-    {
-        return $this->hasMany(Income::class, 'user_submission_id', 'id');
-    }
-
     public function incomes(): HasMany
     {
         return $this->hasMany(Income::class, 'user_submission_id', 'id');

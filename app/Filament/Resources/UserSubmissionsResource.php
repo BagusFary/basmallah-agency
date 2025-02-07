@@ -8,21 +8,23 @@ use Filament\Forms\Form;
 use Filament\Tables\Table;
 use App\Models\UserSubmission;
 use Filament\Resources\Resource;
+use Filament\Tables\Actions\Action;
 use Filament\Forms\Components\Radio;
+use Maatwebsite\Excel\Facades\Excel;
 use Filament\Forms\Components\Select;
+use App\Exports\UserSubmissionsExport;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Repeater;
+use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
 use Illuminate\Database\Eloquent\Builder;
-use App\Filament\Resources\UserSubmissionsResource\Pages;
 use App\Models\HousingPartner;
 use App\Models\Income;
-use Filament\Tables\Filters\Filter;
-use Filament\Tables\Filters\SelectFilter;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Collection;
+use App\Filament\Resources\UserSubmissionsResource\Pages;
+use Malzariey\FilamentDaterangepickerFilter\Fields\DateRangePicker;
 
 class UserSubmissionsResource extends Resource
 {
@@ -84,7 +86,7 @@ class UserSubmissionsResource extends Resource
                         TextInput::make('salary')
                             ->numeric()
                     ])
-                    ->relationship('income')
+                    ->relationship('incomes')
                     ->defaultItems(1)
             ]);
     }
@@ -92,7 +94,7 @@ class UserSubmissionsResource extends Resource
     protected static function getIncome(UserSubmission $model)
     {
         $dynamicSchemaIncome = [];
-        foreach ($model->income as $income) {
+        foreach ($model->incomes as $income) {
             $dynamicSchemaIncome[] = TextInput::make("income_{$income->id}")
                 ->label(function () use ($income) {
                     $getType = $income->type;
@@ -133,11 +135,133 @@ class UserSubmissionsResource extends Resource
             ])
             ->deferLoading()
             ->filters([])
+            ->headerActions([
+                Action::make('exportGlobal')
+                    ->label('Export Excel')
+                    ->icon('heroicon-m-folder-arrow-down')
+                    ->form([
+                        Section::make('Filter Export User Submission')
+                            ->schema([
+                                Select::make('housing_partner_id')
+                                    ->label('Housing Partner')
+                                    ->relationship('housingPartner', 'name')
+                                    ->placeholder('Pilih Housing Partner')
+                                    ->native(false),
+                                DateRangePicker::make('created_at')
+                                    ->label('Rentang Tanggal')
+                                    ->placeholder('Pilih Rentang Tanggal'),
+                                Select::make('employment_status')
+                                    ->label('Status Pekerjaan')
+                                    ->placeholder('Pilih Status Pekerjaan')
+                                    ->options([
+                                        'self_employees' => 'Wirausaha',
+                                        'civil_servants' => 'PNS',
+                                        'employees' => 'Pegawai Swasta',
+                                    ])
+                                    ->native(false)
+                                    ->live(),
+                                Section::make('Omset Rata - Rata Perbulan')
+                                    ->schema([
+                                        TextInput::make('avg_turnover_min')
+                                            ->label('Minimal')
+                                            ->placeholder('Masukkan Omset Minimal')
+                                            ->inputMode('numeric')
+                                            ->minValue(0)
+                                            ->numeric()
+                                            ->prefix('Rp.')
+                                            ->mask(RawJs::make('$money($input)'))
+                                            ->stripCharacters(','),
+                                        TextInput::make('avg_turnover_max')
+                                            ->label('Maksimal')
+                                            ->placeholder('Masukkan Omset Maksimal')
+                                            ->inputMode('numeric')
+                                            ->minValue(0)
+                                            ->numeric()
+                                            ->prefix('Rp.')
+                                            ->mask(RawJs::make('$money($input)'))
+                                            ->stripCharacters(',')
+                                            ->gt('avg_turnover_min'),
+                                    ])
+                                    ->columns(2)
+                                    ->visible(fn($get) => $get('employment_status') === 'self_employees'),
+                                Select::make('has_instalment')
+                                    ->label('Punya Cicilan')
+                                    ->placeholder('Apakah user memiliki cicilan?')
+                                    ->options([
+                                        "1" => 'Ya',
+                                        "0" => 'Tidak'
+                                    ])
+                                    ->native(false)
+                                    ->live(),
+                                Section::make('Jumlah Cicilan')
+                                    ->schema([
+                                        TextInput::make('instalment_amount_min')
+                                            ->label('Minimal')
+                                            ->placeholder('Masukkan Minimal Cicilan')
+                                            ->inputMode('numeric')
+                                            ->minValue(0)
+                                            ->numeric()
+                                            ->prefix('Rp.')
+                                            ->mask(RawJs::make('$money($input)'))
+                                            ->stripCharacters(','),
+                                        TextInput::make('instalment_amount_max')
+                                            ->label('Maksimal')
+                                            ->placeholder('Masukkan Maksimal Cicilan')
+                                            ->inputMode('numeric')
+                                            ->minValue(0)
+                                            ->numeric()
+                                            ->prefix('Rp.')
+                                            ->mask(RawJs::make('$money($input)'))
+                                            ->stripCharacters(',')
+                                            ->gt('instalment_amount_min'),
+                                    ])
+                                    ->columns(2)
+                                    ->visible(fn($get) => $get('has_instalment') === '1'),
+                                Select::make('income_type')
+                                    ->label('Tipe Penghasilan')
+                                    ->placeholder('Pilih Tipe Penghasilan')
+                                    ->options([
+                                        'Self Income' => 'Pribadi',
+                                        'Joint Income' => 'Joint Income'
+                                    ])
+                                    ->native(false)
+                                    ->live(),
+                                Section::make('Penghasilan')
+                                    ->schema([
+                                        TextInput::make('salary_min')
+                                            ->label('Minimal')
+                                            ->placeholder('Masukkan Minimal Penghasilan')
+                                            ->inputMode('numeric')
+                                            ->minValue(0)
+                                            ->numeric()
+                                            ->prefix('Rp.')
+                                            ->mask(RawJs::make('$money($input)'))
+                                            ->stripCharacters(','),
+                                        TextInput::make('salary_max')
+                                            ->label('Maksimal')
+                                            ->placeholder('Masukkan Maksimal Penghasilan')
+                                            ->inputMode('numeric')
+                                            ->minValue(0)
+                                            ->numeric()
+                                            ->prefix('Rp.')
+                                            ->mask(RawJs::make('$money($input)'))
+                                            ->stripCharacters(',')
+                                            ->gt('salary_min'),
+                                    ])
+                                    ->columns(2)
+                            ])
+                            ->columns(2)
+                    ])
+                    ->action(function (array $data) {
+                        return Excel::download(new UserSubmissionsExport($data), 'RekapitulasiForm-' . now()->format('Ymd_His') . '.xlsx');
+                    })
+
+            ])
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\Action::make('detail')
                     ->form([
-                        Section::make(fn(UserSubmission $record): string => $record->housingPatner->name)
+                        Section::make(fn(UserSubmission $record): string => $record->housingPartner->name)
                             ->schema([
                                 TextInput::make('id_card')
                                     ->default(fn(UserSubmission $record): string => $record->id_card)
@@ -199,7 +323,7 @@ class UserSubmissionsResource extends Resource
                                     ->prefix('Rp.')
                                     ->mask(RawJs::make('$money($input)')),
                                 TextInput::make('type')
-                                    ->default(fn(UserSubmission $record): string => $record->income[0]->type === 'self' ? 'Pribadi' : 'Join Income')
+                                    ->default(fn(UserSubmission $record): string => $record->incomes[0]->type === 'self' ? 'Pribadi' : 'Join Income')
                                     ->readOnly()
                                     ->columnSpan(2)
                                     ->label('Tipe Penghasilan'),
@@ -212,9 +336,7 @@ class UserSubmissionsResource extends Resource
                                     ->columnSpan(2)
                                     ->schema(fn(UserSubmission $record) => $record ? static::getIncome($record) : []),
                             ])->columns(2)
-
-
-                    ])
+                    ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -235,6 +357,18 @@ class UserSubmissionsResource extends Resource
                         })
                         ->after(fn() => Cache::forget('index-housing-list'))
                         ->deselectRecordsAfterCompletion(),
+                    BulkAction::make('exportBulk')
+                        ->requiresConfirmation()
+                        ->label('Export Excel')
+                        ->icon('heroicon-m-folder-arrow-down')
+                        ->action(function (Collection $records) {
+
+                            $data = [
+                                'user_submission_id' => $records->pluck('id')
+                            ];
+
+                            return Excel::download(new UserSubmissionsExport($data), 'RekapitulasiForm-' . now()->format('Ymd_His') . '.xlsx');
+                        })
                 ]),
             ])
             ->paginated([10, 25, 50, 100]);
