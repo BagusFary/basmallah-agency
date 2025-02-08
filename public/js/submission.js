@@ -153,3 +153,19 @@ $(document).ready(function () {
     checkIncomeStatus();
     checkInstalmentStatus();
 });
+
+$(".share-button").on("click", async (event) => {
+    try {
+        const titleName = $("#title-name").text();
+        const data = {
+            title: "Form Submission | " + titleName,
+            text: "Ambil rumah anda di Basmallah Agency!",
+            url: $(".share-button").attr("id"),
+        };
+        // return console.log(data);
+        await navigator.share(data);
+        $(".share-button").text("Sudah Dibagikan");
+    } catch (err) {
+        $(".share-button").text("Error");
+    }
+});

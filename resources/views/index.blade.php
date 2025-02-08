@@ -9,7 +9,7 @@
 @endpush
 
 @section('content')
-    {{-- <section id="container" class="transition bg-cover ease-in-out bg-center bg-no-repeat bg-vintage-brem bg-blend-multiply"
+    <section id="container" class="transition bg-cover ease-in-out bg-center bg-no-repeat bg-vintage-brem bg-blend-multiply"
         style="background-image: url('{{ $heroImage ?? '' }}')">
         <div class="px-4 mx-auto max-w-screen-xl text-center py-24 lg:py-56">
             <h1 class="mb-4 text-4xl font-extrabold tracking-tight leading-none text-white md:text-5xl lg:text-6xl">
@@ -31,7 +31,7 @@
                 </a>
             </div>
         </div>
-    </section> --}}
+    </section>
 
     <svg xmlns="http://www.w3.org/2000/svg" class="" viewBox="0 0 1440 320">
         <path fill="#747264" fill-opacity="1"
