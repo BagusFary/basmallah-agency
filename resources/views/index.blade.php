@@ -4,9 +4,13 @@
 
 @section('description', 'Basmallah Agency merupakan Agen Properti yang sudah berjalan lama')
 
+@push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js"></script>
+@endpush
+
 @section('content')
     <section id="container" class="transition bg-cover ease-in-out bg-center bg-no-repeat bg-vintage-brem bg-blend-multiply"
-        style="background-image: url('{{ $heroImage }}')">
+        style="background-image: url('{{ $heroImage ?? '' }}')">
         <div class="px-4 mx-auto max-w-screen-xl text-center py-24 lg:py-56">
             <h1 class="mb-4 text-4xl font-extrabold tracking-tight leading-none text-white md:text-5xl lg:text-6xl">
                 Basmallah Agency
@@ -28,18 +32,14 @@
             </div>
         </div>
     </section>
-    {{-- <svg xmlns="http://www.w3.org/2000/svg" class="dark:hidden" viewBox="0 0 1440 320">
-        <path fill="#E0CCBE" fill-opacity="1"
-            d="M0,160L60,176C120,192,240,224,360,202.7C480,181,600,107,720,101.3C840,96,960,160,1080,197.3C1200,235,1320,245,1380,250.7L1440,256L1440,0L1380,0C1320,0,1200,0,1080,0C960,0,840,0,720,0C600,0,480,0,360,0C240,0,120,0,60,0L0,0Z">
-        </path>
-    </svg> --}}
+
     <svg xmlns="http://www.w3.org/2000/svg" class="" viewBox="0 0 1440 320">
         <path fill="#747264" fill-opacity="1"
             d="M0,160L60,176C120,192,240,224,360,202.7C480,181,600,107,720,101.3C840,96,960,160,1080,197.3C1200,235,1320,245,1380,250.7L1440,256L1440,0L1380,0C1320,0,1200,0,1080,0C960,0,840,0,720,0C600,0,480,0,360,0C240,0,120,0,60,0L0,0Z">
         </path>
     </svg>
 
-    <section id="about" class="py-8 antialiased md:py-16">
+    <section id="about" class=" antialiased">
         <div class="mx-auto grid max-w-screen-xl px-4 pb-8 md:grid-cols-12 lg:gap-12 lg:pb-16 xl:gap-0">
             <div class="content-center justify-self-start md:col-span-7 md:text-start">
                 <h1
@@ -57,7 +57,7 @@
                 </p>
             </div>
             <div class="hidden md:col-span-5 md:mt-0 md:flex">
-                <img class="dark:hidden" src="{{ asset('Hero Images.png') }}" alt="shopping illustration" />
+                <img id="img-hero" class="dark:hidden" src="{{ asset('Hero Images.png') }}" alt="shopping illustration" />
             </div>
         </div>
         <div class="grid gap-3">
@@ -67,62 +67,59 @@
                 @foreach ($housingPartners as $partner)
                     <a href="#" class="flex items-center md:justify-center">
                         <h1
-                            class="h-6 text-vintage-brem hover:text-vintage-dark dark:hover:text-white font-bold text-sm md:text-3xl">
+                            class="h-6 text-vintage-brem hover:text-vintage-dark dark:hover:text-white font-bold text-sm max-md:scale-75 md:text-3xl">
                             {{ $partner }}
                         </h1>
                     </a>
                 @endforeach
             </div>
         </div>
-
+        <svg xmlns="http://www.w3.org/2000/svg" class="-mb-3" viewBox="0 0 1440 320">
+            <path fill="#3C3633" fill-opacity="1"
+                d="M0,160L60,176C120,192,240,224,360,202.7C480,181,600,107,720,101.3C840,96,960,160,1080,197.3C1200,235,1320,245,1380,250.7L1440,256L1440,320L1380,320C1320,320,1200,320,1080,320C960,320,840,320,720,320C600,320,480,320,360,320C240,320,120,320,60,320L0,320Z">
+            </path>
+        </svg>
     </section>
 
-    {{-- <section
-        class="bg-center bg-no-repeat bg-[url('https://images.pexels.com/photos/396303/pexels-photo-396303.jpeg?auto=compress&cs=tinysrgb&dpr=1')] bg-gray-700 bg-blend-multiply">
-        <div class="flex flex-col flex-col-reverse md:flex-row justify-between items-center container mx-auto">
-            <div class="max-w-screen-xl text-center py-24 lg:py-56">
-                <h1 class="mb-4 text-4xl font-extrabold tracking-tight leading-none text-white md:text-5xl lg:text-6xl">
-                    Kenapa Pilih Basmallah Agency?
-                </h1>
-                <p class="mb-8 text-lg font-normal text-gray-300 lg:text-xl">
-                    Basmallah Agency siap membantu menemukan rumah impian anda dengan DP 0%
-                </p>
+    <section class="bg-vintage-dark py-8 antialiased md:py-16 px-3">
+        <div class="container mx-auto">
+            <div class=" text-center text-white">
+                <h1 class="text-xl md:text-4xl font-bold uppercase">Hadiah Souvenir Menarik!</h1>
+                <span class="text-small font-light text-vintage-light">Dapatkan hadiah menarik dengan mendaftar melalui
+                    <b>Basmallah Agency</b>. <span class="underline">S&K</span></span>
             </div>
-
-            <div class="max-w-screen-xl text-center ">
-                <img src="{{ asset('promo-icon.svg') }}" class="h-full w-full mx-auto md:scale-125" alt="Promo Icon 1">
+            <div class="grid grid-cols-1 md:grid-cols-2 content-center">
+                <div class="flex flex-col justify-center items-center relative">
+                    <img id="souvenir-1" src="{{ asset('souvenir/souvenir (1).png') }}" class="scale-75 md:scale-100"
+                        alt="">
+                    <span id="text-souvenir-1"
+                        class="bg-white text-vintage-dark px-3 text-lg md:text-2xl font-bold uppercase text-center">Goto
+                        Moko Alat Pel</span>
+                </div>
+                <div class="flex flex-col justify-center items-center">
+                    <img id="souvenir-2" src="{{ asset('souvenir/souvenir (2).png') }}" class="scale-75 md:scale-75"
+                        alt="">
+                    <span id="text-souvenir-2"
+                        class="bg-white text-vintage-dark px-3 text-lg md:text-2xl font-bold uppercase text-center">Satu
+                        Keluarga Dispenser Beras</span>
+                </div>
+                <div class="flex flex-col justify-center items-center">
+                    <img id="souvenir-3" src="{{ asset('souvenir/souvenir (3).png') }}" class="scale-75 md:scale-75"
+                        alt="">
+                    <span id="text-souvenir-3"
+                        class="bg-white text-vintage-dark px-3 text-lg md:text-2xl font-bold uppercase text-center">VISHAL
+                        Silicone Set Kitchen Utensil</span>
+                </div>
             </div>
         </div>
-
-    </section> --}}
-    {{-- <section class="flex flex-col dark:hidden">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320">
-            <path fill="#E0CCBE" fill-opacity="1"
-                d="M0,160L60,176C120,192,240,224,360,202.7C480,181,600,107,720,101.3C840,96,960,160,1080,197.3C1200,235,1320,245,1380,250.7L1440,256L1440,320L1380,320C1320,320,1200,320,1080,320C960,320,840,320,720,320C600,320,480,320,360,320C240,320,120,320,60,320L0,320Z">
-            </path>
-        </svg>
-
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320">
-            <path fill="#E0CCBE" fill-opacity="1"
-                d="M0,160L60,176C120,192,240,224,360,202.7C480,181,600,107,720,101.3C840,96,960,160,1080,197.3C1200,235,1320,245,1380,250.7L1440,256L1440,0L1380,0C1320,0,1200,0,1080,0C960,0,840,0,720,0C600,0,480,0,360,0C240,0,120,0,60,0L0,0Z">
-            </path>
-        </svg>
-    </section> --}}
-
-
-
-    <section id="house-list" class="bg-vintage-light">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320">
-            <path fill="#3C3633" fill-opacity="1"
-                d="M0,160L60,176C120,192,240,224,360,202.7C480,181,600,107,720,101.3C840,96,960,160,1080,197.3C1200,235,1320,245,1380,250.7L1440,256L1440,320L1380,320C1320,320,1200,320,1080,320C960,320,840,320,720,320C600,320,480,320,360,320C240,320,120,320,60,320L0,320Z">
-            </path>
-        </svg>
-        <svg xmlns="http://www.w3.org/2000/svg" class="-mt-1" viewBox="0 0 1440 320">
+    </section>
+    <section class="bg-vintage-light">
+        <svg xmlns="http://www.w3.org/2000/svg" class="" viewBox="0 0 1440 320">
             <path fill="#3C3633" fill-opacity="1"
                 d="M0,160L60,176C120,192,240,224,360,202.7C480,181,600,107,720,101.3C840,96,960,160,1080,197.3C1200,235,1320,245,1380,250.7L1440,256L1440,0L1380,0C1320,0,1200,0,1080,0C960,0,840,0,720,0C600,0,480,0,360,0C240,0,120,0,60,0L0,0Z">
             </path>
         </svg>
-        <div class="py-8 px-4 mx-auto max-w-screen-xl lg:py-16 ">
+        <div id="house-list" class="py-8 px-4 mx-auto max-w-screen-xl lg:py-16 ">
             <div class="mx-auto max-w-screen-sm text-center mb-8 lg:mb-16">
                 <h2 class="mb-4 text-4xl tracking-tight font-extrabold text-vintage-dark dark:text-white">List Perumahan
                 </h2>
@@ -166,7 +163,7 @@
 
                                 <div class="mt-auto mb-5">
                                     <a href="/housing-partners/{{ $house->id }}/submission"
-                                        class="border-2 font-bold text-vintage-dark hover:bg-vintage-dark hover:text-white border px-3 py-2 border-vintage-dark bg-transparent">
+                                        class="border-2 hover:-translate-2 font-bold text-vintage-dark hover:bg-vintage-dark hover:text-white border px-3 py-2 border-vintage-dark bg-transparent">
                                         Daftar Sekarang
                                     </a>
                                 </div>
@@ -174,60 +171,19 @@
                         </div>
                     </article>
                 @endforeach
-                {{-- @foreach ($houseLists as $house)
-                    <article
-                        class="grid grid-flow-col grid-rows-3 relative border border-vintage-cream bg-vintage-light rounded-lg">
-                        <div class="relative row-span-3">
-                            <img class="w-full h-[200px] object-center md:w-56 md:h-md rounded-lg sm:rounded-none sm:rounded-l-lg  object-cover"
-                                src="{{ asset("storage/$house->image_url") }}" alt="Bonnie Avatar">
-                        </div>
-                        <div class="p-3 col-span-2 flex flex-col md:h-full">
-                            <div class="">
-                                <h3 class="text-xl font-bold">
-                                    <h1 class="font-bold text-lg text-vintage-dark dark:text-white md:text-2xl">
-                                        {{ $house->name }}
-                                    </h1>
-                                </h3>
-                                <span
-                                    class="bg-vintage-dark text-white text-sm font-medium me-2 mt-3 px-2.5 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300">DP
-                                    {{ $house->down_payment }}%</span>
-                                <p class="mt-3 mb-4 font-light text-vintage-dark dark:text-white">
-                                    Booking Fee : <span class="font-semibold">Rp.
-                                        {{ \Number::format($house->booking_fee, locale: 'id') }}</span>
-                                </p>
-                            </div>
-                            <div class="mt-auto">
-                                <a href="/housing-partners/{{ $house->id }}/submission" type="button"
-                                    class="text-white bg-vintage-dark hover:bg-vintage-dark focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-vintage-cream dark:text-black dark:hover:bg-vintage-light dark:focus:ring-vintage-brem">
-                                    Daftar
-                                    <svg class="rtl:rotate-180 w-3.5 h-3.5 ms-2" aria-hidden="true"
-                                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
-                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                            stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9" />
-                                    </svg>
-                                </a>
-                            </div>
-                        </div>
-                        <div
-                            class="col-span-2 row-span-2 flex justify-between bg-vintage-dark text-white rounded-lg bottom-0 inset-x-0 text-lg font-medium px-2.5 py-0.5 rounded-sm dark:bg-vintage-cream dark:text-black ">
-                            Tersisa
-                            <span class="text-end">{{ \Number::format($house->available, locale: 'id') }}</span>
-                        </div>
-                    </article>
-                @endforeach --}}
             </div>
         </div>
     </section>
 
 
     <section id="faq" class=" antialiased bg-vintage-brem">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320">
+        <svg xmlns="http://www.w3.org/2000/svg" class="-mt-3" viewBox="0 0 1440 320">
             <path fill="#EEEDEB" fill-opacity="1"
                 d="M0,256L40,229.3C80,203,160,149,240,144C320,139,400,181,480,208C560,235,640,245,720,234.7C800,224,880,192,960,192C1040,192,1120,224,1200,229.3C1280,235,1360,213,1400,202.7L1440,192L1440,0L1400,0C1360,0,1280,0,1200,0C1120,0,1040,0,960,0C880,0,800,0,720,0C640,0,560,0,480,0C400,0,320,0,240,0C160,0,80,0,40,0L0,0Z">
             </path>
         </svg>
 
-        <div class="mx-auto max-w-screen-xl px-4 2xl:px-0">
+        <div class="mx-auto max-w-screen-xl px-4 2xl:px-0 py-8">
             <div class="lg:flex lg:items-center lg:justify-between lg:gap-4">
                 <h2 class="mb-4 text-lg md:text-4xl tracking-tight font-extrabold text-white dark:text-white">
                     Frequently
@@ -262,31 +218,8 @@
             @endif
 
         </div>
-        <footer class="mt-4 bg-vintage-dark">
-            <div class="w-full max-w-screen-xl mx-3 md:mx-auto md:py-8">
-                <div class="sm:flex sm:items-center sm:justify-between">
-                    <a href="https://flowbite.com/" class="flex items-center mb-4 sm:mb-0 space-x-3 rtl:space-x-reverse">
-                        <span
-                            class="self-center uppercase text-white text-2xl font-bold whitespace-nowrap dark:text-white">Basmallah
-                            Agency</span>
-                    </a>
-                    <ul class="flex flex-wrap items-center mb-6 text-sm font-medium text-white sm:mb-0 dark:text-gray-400">
-                        <li>
-                            <a href="#" class="hover:underline me-4 md:me-6">basmallahagency@gmail.com</a>
-                        </li>
-                        <li>
-                            <a href="#" class="hover:underline me-4 md:me-6">082341312321</a>
-                        </li>
-                    </ul>
-                </div>
-                <hr class="my-6 border-white sm:mx-auto dark:border-gray-700 lg:my-8" />
-                <span class="block text-sm text-white sm:text-center dark:text-gray-400">©
-                    {{ \Carbon\Carbon::now()->format('Y') }} <a href="https://flowbite.com/"
-                        class="hover:underline">Lastation™</a>. All Rights Reserved.</span>
-            </div>
-        </footer>
-    </section>
 
+    </section>
 
 
 
