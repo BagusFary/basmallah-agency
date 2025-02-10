@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Tables\Enums\FiltersLayout;
 use Filament\Support\RawJs;
 use Filament\Tables;
 use Filament\Forms\Form;
@@ -24,10 +25,15 @@ use App\Models\Income;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Collection;
 use App\Filament\Resources\UserSubmissionsResource\Pages;
-use App\Filament\Resources\UserSubmissionsResource\RelationManagers;
+use Filament\Forms\Components\Checkbox;
+use Filament\Forms\Components\CheckboxList;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
+use Filament\Tables\Columns\CheckboxColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\Indicator;
 use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
 use Malzariey\FilamentDaterangepickerFilter\Fields\DateRangePicker;
 
 class UserSubmissionsResource extends Resource
@@ -138,26 +144,27 @@ class UserSubmissionsResource extends Resource
 
             ])
             ->filters([
-                Filter::make('incomes.salary')
+                Filter::make('has_instalment')
+                    ->label('Punya Cicilan?')
                     ->form([
-                        Section::make('Penghasilan')
-                            ->collapsible()
-                            ->collapsed()
-                            ->schema([
-                                TextInput::make('minSalary')
-                                    ->label('Minimal Penghasilan')
-                                    ->numeric()
-                                    ->prefix('Rp.')
-                                    ->mask(RawJs::make('$money($input)')),
-                                TextInput::make('maxSalary')
-                                    ->label('Maksimal Penghasilan')
-                                    ->numeric()
-                                    ->prefix('Rp.')
-                                    ->mask(RawJs::make('$money($input)'))
-                            ]),
+                        DateRangePicker::make('createdAt')
+                            ->label('Rentang Tanggal')
+                            ->placeholder('Pilih Rentang Tanggal'),
+                        Radio::make('isCicilan')
+                            ->options([
+                                '1' => 'Punya',
+                                '0' => 'Tidak Punya'
+                            ])
+                            ->columns(2)
+                            ->label('Cicilan?')
+                            ->afterStateUpdated(function (?string $state, Set $set) {
+                                if ($state == '0') {
+                                    $set('minCicilan', null);
+                                    $set('maxCicilan', null);
+                                }
+                            })
+                            ->live(),
                         Section::make('Cicilan')
-                            ->collapsible()
-                            ->collapsed()
                             ->schema([
                                 TextInput::make('minCicilan')
                                     ->label('Minimal Cicilan')
@@ -170,18 +177,19 @@ class UserSubmissionsResource extends Resource
                                     ->prefix('Rp.')
                                     ->mask(RawJs::make('$money($input)'))
                             ])
+                            ->visible(function (Get $get) {
+                                return $get('isCicilan') ?? false;
+                            })
+                            ->columns(2)
                     ])
-                    ->indicateUsing(function (array $data): array {
+                    ->indicateUsing(function ($data) {
                         $indicator = [];
 
-                        if ($data['minSalary'] ?? null) {
-                            $indicator[] = Indicator::make('Minimal Penghasilan: Rp. ' .  $data['minSalary'])
-                                ->removeField('minSalary');
-                        }
-
-                        if ($data['maxSalary'] ?? null) {
-                            $indicator[] = Indicator::make('Maksimal Penghasilan: Rp. ' . $data['maxSalary'])
-                                ->removeField('maxSalary');
+                        if (isset($data['isCicilan'])) {
+                            $text = $data['isCicilan'] ? 'Punya' : 'Tidak Punya';
+                            $indicator[] = Indicator::make("$text Cicilan")
+                                // ->removeField('isCicilan')
+                                ->removable(false);
                         }
 
                         if ($data['minCicilan'] ?? null) {
@@ -197,12 +205,82 @@ class UserSubmissionsResource extends Resource
                         return $indicator;
                     })
                     ->query(function (Builder $query, array $data) {
+                        $query->when(isset($data['isCicilan']), function (Builder $query, $hasInstalment) use ($data) {
+                            $query->where('has_instalment', $data['isCicilan']);
+
+                            $query->when($data['isCicilan'] == '1', function (Builder $query) use ($data) {
+                                $query->when($data['minCicilan'] ?? null, function ($query, $minCicilan) {
+                                    $minCicilan = str_replace([','], '', $minCicilan ?? null);
+
+                                    $query->where('instalment_amount', '>=', $minCicilan);
+                                });
+                                $query->when($data['maxCicilan'] ?? null, function ($query, $maxCicilan) {
+                                    $maxCicilan = str_replace([','], '', $maxCicilan ?? null);
+
+                                    $query->where('instalment_amount', '<=', $maxCicilan);
+                                });
+                            });
+                        });
+
+                        $query->when(isset($data['createdAt']), function (Builder $query) use ($data) {
+                            $dates = explode(' - ', $data['createdAt']);
+                            $startDate = \Carbon\Carbon::createFromFormat('d/m/Y', trim($dates[0]))->startOfDay();
+                            $endDate = \Carbon\Carbon::createFromFormat('d/m/Y', trim($dates[1]))->endOfDay();
+                            $query->whereBetween('created_at', [$startDate, $endDate]);
+                        });
+
+                        return $query;
+                    })
+                    ->columns(2)
+                    ->columnSpanFull(),
+                SelectFilter::make('housing_partner_id')
+                    ->relationship(name: 'housingPartner', titleAttribute: 'name')
+                    ->native(false)
+                    ->label('Perumahan'),
+                SelectFilter::make('employment_status')
+                    ->options([
+                        'self_employees' => 'Wirausaha',
+                        'civil_servants' => 'PNS',
+                        'employees' => 'Karyawan'
+                    ])
+                    ->native(false)
+                    ->label('Status Pekerjaan'),
+                Filter::make('incomes.salary')
+                    ->form([
+                        Section::make('Penghasilan')
+                            ->schema([
+                                TextInput::make('minSalary')
+                                    ->label('Minimal Penghasilan')
+                                    ->numeric()
+                                    ->prefix('Rp.')
+                                    ->mask(RawJs::make('$money($input)')),
+                                TextInput::make('maxSalary')
+                                    ->label('Maksimal Penghasilan')
+                                    ->numeric()
+                                    ->prefix('Rp.')
+                                    ->mask(RawJs::make('$money($input)'))
+                            ])
+                            ->columns(2),
+                    ])
+                    ->indicateUsing(function (array $data): array {
+                        $indicator = [];
+
+                        if ($data['minSalary'] ?? null) {
+                            $indicator[] = Indicator::make('Minimal Penghasilan: Rp. ' .  $data['minSalary'])
+                                ->removeField('minSalary');
+                        }
+
+                        if ($data['maxSalary'] ?? null) {
+                            $indicator[] = Indicator::make('Maksimal Penghasilan: Rp. ' . $data['maxSalary'])
+                                ->removeField('maxSalary');
+                        }
+
+                        return $indicator;
+                    })
+                    ->query(function (Builder $query, array $data) {
                         $minSalary = str_replace([','], '', $data['minSalary'] ?? null);
                         $maxSalary = str_replace([','], '', $data['maxSalary'] ?? null);
-                        $minCicilan = str_replace([','], '', $data['minCicilan'] ?? null);
-                        $maxCicilan = str_replace([','], '', $data['maxCicilan'] ?? null);
                         return
-                            // dd($minSalary);
                             $query
                             ->when($minSalary ?? null, function ($query, $minSalary) {
                                 return $query->whereHas('incomes', function ($q) use ($minSalary) {
@@ -213,15 +291,11 @@ class UserSubmissionsResource extends Resource
                                 return $query->whereHas('incomes', function ($q) use ($maxSalary) {
                                     $q->selectRaw('SUM(salary) as total_salary')->having('total_salary', '<=', $maxSalary);
                                 });
-                            })
-                            ->when($minCicilan ?? null, function ($query, $minCicilan) {
-                                return $query->where('instalment_amount', '>=', $minCicilan);
-                            })
-                            ->when($maxCicilan ?? null, function ($query, $maxCicilan) {
-                                return $query->where('instalment_amount', '<=', $maxCicilan);
                             });
                     })
-            ])
+                    ->columnSpanFull()
+            ], layout: FiltersLayout::AboveContentCollapsible)
+            ->filtersFormColumns(2)
             ->deferLoading()
             ->headerActions([
                 Action::make('exportGlobal')
