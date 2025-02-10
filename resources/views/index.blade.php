@@ -103,7 +103,7 @@
                         class="bg-white text-vintage-dark px-3 text-lg md:text-2xl font-bold uppercase text-center">Satu
                         Keluarga Dispenser Beras</span>
                 </div>
-                <div class="flex flex-col justify-center items-center">
+                <div class="flex flex-col justify-center items-center col-span-full">
                     <img id="souvenir-3" src="{{ asset('souvenir/souvenir (3).png') }}" class="scale-75 md:scale-75"
                         alt="">
                     <span id="text-souvenir-3"
