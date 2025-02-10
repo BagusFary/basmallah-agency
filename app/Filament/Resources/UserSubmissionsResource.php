@@ -39,7 +39,7 @@ class UserSubmissionsResource extends Resource
 {
     protected static ?string $model = UserSubmission::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-document-duplicate';
 
     public static function form(Form $form): Form
     {
@@ -130,15 +130,15 @@ class UserSubmissionsResource extends Resource
                 TextColumn::make('housingPartner.name')
                     ->label('Perumahan')
                     ->searchable(),
-                TextColumn::make('id_card')
-                    ->label('NIK')
-                    ->searchable(['email','address', 'phone', 'name', 'id_card', ]),
+                TextColumn::make('referral_code')
+                    ->label('Kode Referral')
+                    ->searchable(),
                 TextColumn::make('name')
-                    ->label('Nama'),
-                TextColumn::make('email')
-                    ->label('Email'),
-                TextColumn::make('address')
-                    ->label('Alamat')
+                    ->label('Nama')
+                    ->searchable(),
+                TextColumn::make('phone')
+                    ->label('Nomor WhatsApp')
+                    ->searchable(),
 
             ])
             ->filters([
@@ -193,14 +193,14 @@ class UserSubmissionsResource extends Resource
                                         ])
                                         ->columns(2)
                                         ->visible(fn ($get) => $get('employment_status') === 'self_employees'),
-                                    Select::make('has_instalment')
+                                    Radio::make('has_instalment')
                                         ->label('Punya Cicilan')
-                                        ->placeholder('Apakah user memiliki cicilan?')
                                         ->options([
                                             "1" => 'Ya', 
                                             "0" => 'Tidak'
                                         ])
-                                        ->native(false)
+                                        ->inline()
+                                        ->inlineLabel(false) 
                                         ->live(),
                                         Section::make('Jumlah Cicilan')
                                         ->schema([
@@ -261,10 +261,11 @@ class UserSubmissionsResource extends Resource
                                 ])
                                 ->columns(2)
                         ])
-                        ->action(function(array $data){
+                        ->action( function(array $data){
                             return Excel::download(new UserSubmissionsExport($data), 'RekapitulasiForm-' . now()->format('Ymd_His') . '.xlsx');
                         })
-                        
+                        ->modalSubmitActionLabel('Export')
+                        ->modalCancelActionLabel('Batal')                      
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
