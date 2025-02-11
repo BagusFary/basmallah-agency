@@ -33,23 +33,23 @@ class UserSubmissionRequest extends FormRequest
             'has_instalment' => 'required|in:1,0',
             'instalment_amount' => [
                 'numeric',
-                Rule::when($this->has_instalment == 1, ['min:1']), 
+                Rule::when($this->has_instalment == 1, ['min:1', 'max:99999999999']), 
             ],    
             'avg_monthly_turnover' => [
                 'numeric',
-                Rule::when($this->employment_status == 'self_employees', ['min:1'])
+                Rule::when($this->employment_status == 'self_employees', ['min:1','max:99999999999'])
             ],
             'join_husband' => [
                 'numeric',
-                Rule::when($this->salary == 'joint_income', ['min:1'])
+                Rule::when($this->salary == 'joint_income', ['min:1', 'max:99999999999'])
             ],
             'join_wife' => [
                 'numeric',
-                Rule::when($this->salary == 'joint_income', ['min:1'])
+                Rule::when($this->salary == 'joint_income', ['min:1', 'max:99999999999'])
             ],
             'self_income' => [
                 'numeric',
-                Rule::when($this->salary == 'personal_income', ['min:1'])
+                Rule::when($this->salary == 'personal_income', ['min:1', 'max:99999999999'])
             ]
         ];
     }

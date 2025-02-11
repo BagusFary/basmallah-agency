@@ -2,39 +2,42 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Tables\Enums\FiltersLayout;
-use Filament\Support\RawJs;
 use Filament\Tables;
+use App\Models\Income;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Filament\Support\RawJs;
+use App\Models\HousingPartner;
 use App\Models\UserSubmission;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\Action;
+use Filament\Tables\Filters\Filter;
 use Filament\Forms\Components\Radio;
 use Maatwebsite\Excel\Facades\Excel;
 use Filament\Forms\Components\Select;
+use Illuminate\Support\Facades\Cache;
 use App\Exports\UserSubmissionsExport;
 use Filament\Forms\Components\Section;
+use Filament\Tables\Filters\Indicator;
+use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\Repeater;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
+use Filament\Tables\Enums\FiltersLayout;
+use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
-use App\Models\HousingPartner;
-use App\Models\Income;
-use Illuminate\Support\Facades\Cache;
+use Filament\Tables\Filters\TernaryFilter;
+use Filament\Forms\Components\CheckboxList;
+use Filament\Tables\Columns\CheckboxColumn;
 use Illuminate\Database\Eloquent\Collection;
 use App\Filament\Resources\UserSubmissionsResource\Pages;
-use Filament\Forms\Components\Checkbox;
-use Filament\Forms\Components\CheckboxList;
-use Filament\Forms\Get;
-use Filament\Forms\Set;
-use Filament\Tables\Columns\CheckboxColumn;
-use Filament\Tables\Filters\Filter;
-use Filament\Tables\Filters\Indicator;
-use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\TernaryFilter;
 use Malzariey\FilamentDaterangepickerFilter\Fields\DateRangePicker;
+use App\Filament\Resources\UserSubmissionResource\Widgets\StatsOverview;
+use App\Filament\Resources\UserSubmissionsResource\Widgets\StatsOverview as WidgetsStatsOverview;
 
 class UserSubmissionsResource extends Resource
 {
@@ -415,14 +418,17 @@ class UserSubmissionsResource extends Resource
                                 ->columns(2)
                         ])
                         ->action( function(array $data){
-                            return Excel::download(new UserSubmissionsExport($data), 'RekapitulasiForm-' . now()->format('Ymd_His') . '.xlsx');
+                            return Excel::download(new UserSubmissionsExport($data), 'Rekap User Submission - ' . now()->format('Ymd_His') . '.xlsx');
                         })
                         ->modalSubmitActionLabel('Export')
                         ->modalCancelActionLabel('Batal')                      
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
                 Tables\Actions\Action::make('detail')
+                ->iconButton()
+                ->icon('heroicon-s-eye')
+                ->color('info')
+                ->tooltip('Detail')
                     ->form([
                         Section::make(fn(UserSubmission $record): string => $record->housingPartner->name)
                             ->schema([
@@ -499,7 +505,25 @@ class UserSubmissionsResource extends Resource
                                     ->columnSpan(2)
                                     ->schema(fn(UserSubmission $record) => $record ? static::getIncome($record) : []),
                             ])->columns(2)
-                    ]),
+                                ]),
+                Tables\Actions\EditAction::make()
+                ->iconButton()
+                ->tooltip('Edit'),
+                Tables\Actions\DeleteAction::make()
+                ->iconButton()
+                ->icon('heroicon-s-trash')
+                ->color('danger')
+                ->tooltip('Delete')
+                ->action(function (UserSubmission $record){
+                    Income::where('user_submission_id', $record->id)->delete();
+                    UserSubmission::where('id', $record->id)->delete();
+
+                    Notification::make()
+                    ->title('Delete Success')
+                    ->success()
+                    ->body('The record has been successfully deleted.')
+                    ->send();
+                })
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -548,7 +572,6 @@ class UserSubmissionsResource extends Resource
     {
         return [
             'index' => Pages\ListUserSubmissions::route('/'),
-            'create' => Pages\CreateUserSubmissions::route('/create'),
             'edit' => Pages\EditUserSubmissions::route('/{record}/edit'),
         ];
     }
