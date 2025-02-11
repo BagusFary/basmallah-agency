@@ -25,31 +25,31 @@ class UserSubmissionRequest extends FormRequest
         return [
             'email' => 'required|email|unique:user_submissions|max:255',
             'name' => 'required|max:255',
-            'id_card' => 'required|unique:user_submissions|max:50',
+            'id_card' => 'required|unique:user_submissions|max_digits:40',
             'address' => 'required|max:255',
-            'phone' => 'required|unique:user_submissions|max:50',
+            'phone' => 'required|unique:user_submissions|max_digits:20',
             'employment_status' => 'required|in:self_employees,civil_servants,employees',
             'self_employee_as' => 'max:255',
             'has_instalment' => 'required|in:1,0',
             'instalment_amount' => [
                 'numeric',
-                Rule::when($this->has_instalment == 1, ['min:1']), 
+                Rule::when($this->has_instalment == 1, ['min:1', 'max_digits:9']), 
             ],    
             'avg_monthly_turnover' => [
                 'numeric',
-                Rule::when($this->employment_status == 'self_employees', ['min:1'])
+                Rule::when($this->employment_status == 'self_employees', ['min:1','max_digits:9'])
             ],
             'join_husband' => [
                 'numeric',
-                Rule::when($this->salary == 'joint_income', ['min:1'])
+                Rule::when($this->salary == 'joint_income', ['min:1', 'max_digits:9'])
             ],
             'join_wife' => [
                 'numeric',
-                Rule::when($this->salary == 'joint_income', ['min:1'])
+                Rule::when($this->salary == 'joint_income', ['min:1', 'max_digits:9'])
             ],
             'self_income' => [
                 'numeric',
-                Rule::when($this->salary == 'personal_income', ['min:1'])
+                Rule::when($this->salary == 'personal_income', ['min:1', 'max_digits:9'])
             ]
         ];
     }
@@ -78,7 +78,8 @@ class UserSubmissionRequest extends FormRequest
             'unique' => ':attribute sudah ada',
             'max' => ':attribute tidak boleh melebihi Rp.:max',
             'min' => ':attribute minimal Rp.:min',
-            'numeric' => ":attribute wajib berupa angka/nominal"
+            'numeric' => ":attribute wajib berupa angka/nominal",
+            'max_digits' => ':attribute maksimal :max digit'
         ];
     }
 }

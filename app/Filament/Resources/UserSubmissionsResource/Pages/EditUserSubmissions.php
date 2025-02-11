@@ -9,11 +9,4 @@ use Filament\Resources\Pages\EditRecord;
 class EditUserSubmissions extends EditRecord
 {
     protected static string $resource = UserSubmissionsResource::class;
-
-    protected function getHeaderActions(): array
-    {
-        return [
-            Actions\DeleteAction::make(),
-        ];
-    }
 }
