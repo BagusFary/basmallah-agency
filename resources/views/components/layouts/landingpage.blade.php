@@ -8,13 +8,14 @@
     <meta property="og:title" content="Basmallah Agency | Providing Liveable with Good Deal">
     <title>@yield('title')</title>
 
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
     <!-- Styles / Scripts -->
     @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
+       @vite(['resources/css/app.css', 'resources/js/app.js'])
     @else
         <style>
             /* ! tailwindcss v3.4.17 | MIT License | https://tailwindcss.com */
