@@ -11,18 +11,15 @@ use App\Models\HousingPartner;
 use Filament\Resources\Resource;
 use Filament\Tables\Filters\Filter;
 use Illuminate\Support\Facades\Auth;
-use Filament\Forms\Components\Hidden;
-use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
-use Filament\Tables\Columns\ImageColumn;
-use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\FileUpload;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\HousingPartnerResource\Pages;
+use App\Models\Income;
+use App\Models\UserSubmission;
+use Filament\Notifications\Notification;
+use Filament\Tables\Actions\Action;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
-use App\Filament\Resources\HousingPartnerResource\RelationManagers;
-use Storage;
 
 class HousingPartnerResource extends Resource
 {
@@ -139,11 +136,38 @@ class HousingPartnerResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make()
-                    ->requiresConfirmation(),
+                    ->requiresConfirmation()
+                    ->action(function ($record) {
+                        $userSubmissionIds = $record->userSubmission()->get(['id'])->pluck('id');
+
+                        Income::whereIn('user_submission_id', $userSubmissionIds)->delete();
+                        UserSubmission::whereIn('id', $userSubmissionIds)->delete();
+                        $record->delete();
+
+                        Notification::make()
+                            ->title('Delete Success')
+                            ->success()
+                            ->body('The record has been successfully deleted.')
+                            ->send();
+                    }),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->action(function ($records) {
+                            $housingPartnerIds = $records->pluck('id');
+                            $query = UserSubmission::whereIn('housing_partner_id', $housingPartnerIds);
+                            $userSubmissionIds = $query->get(['id'])->pluck('id');
+                            Income::whereIn('user_submission_id', $userSubmissionIds)->delete();
+
+                            $query->delete();
+
+                            HousingPartner::whereIn('id', $housingPartnerIds)->delete();
+
+                            Notification::make()
+                                ->success()
+                                ->title('House Partners Successfully Deleted.');
+                        }),
                 ]),
             ]);
     }

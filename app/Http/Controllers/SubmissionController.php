@@ -74,7 +74,7 @@ class SubmissionController extends Controller
                 $userSubmission->housingPartner()->decrement('available');
                 DB::commit();
                 Cache::forget('index-housing-list');
-                Mail::to('losinto@gmail.com')->send(
+                Mail::to($userSubmission->email)->send(
                     (new SendReferralCode($userSubmission->name, $userSubmission->referral_code, $userSubmission->housingPartner()->first(['name'])->name))->afterCommit()
                 );
 

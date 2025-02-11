@@ -21,6 +21,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
 
+use function Livewire\before;
+
 class FaqsResource extends Resource
 {
     protected static ?string $model = FAQ::class;
@@ -74,10 +76,15 @@ class FaqsResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->action(function ($records) {
+                            $faqIds = $records->pluck('id');
+                            FAQ::whereIn('id', $faqIds)->delete();
+                        })
+                        ->deselectRecordsAfterCompletion(),
                 ]),
             ])
-            ->emptyStateHeading('FAQ No Exists');
+            ->emptyStateHeading("FAQ doesn't exists.");
     }
 
     public static function getRelations(): array
