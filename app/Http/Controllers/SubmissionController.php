@@ -23,7 +23,6 @@ class SubmissionController extends Controller
     public function store(UserSubmissionRequest $request, $id)
     {
         // Creating Referral Code
-        // dd($request->all());
         $housingPartnersExist = HousingPartner::where('id', $id)
             ->where('code', $request['code'])
             ->exists();
@@ -42,7 +41,6 @@ class SubmissionController extends Controller
             ...$validatedData
         ];
 
-        // dd($request->all());
         $incomes = [
             'self' => $validatedData['self_income'],
             'join-husband' => $validatedData['join_husband'],
