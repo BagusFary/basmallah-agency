@@ -1,4 +1,5 @@
 import "flowbite";
+import "../css/app.css";
 
 const loadingContent = `
                             <div
