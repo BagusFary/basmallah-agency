@@ -71,8 +71,18 @@ class FaqsResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\ViewAction::make()
+                ->iconButton()
+                ->icon('heroicon-s-eye')
+                ->color('info')
+                ->tooltip('Detail'),
+                Tables\Actions\EditAction::make()
+                ->iconButton()
+                ->tooltip('Edit'),
+                Tables\Actions\DeleteAction::make()
+                ->iconButton()
+                ->tooltip('Delete')
+                ->requiresConfirmation(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

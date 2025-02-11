@@ -17,7 +17,6 @@ use App\Filament\Resources\HousingPartnerResource\Pages;
 use App\Models\Income;
 use App\Models\UserSubmission;
 use Filament\Notifications\Notification;
-use Filament\Tables\Actions\Action;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
@@ -134,7 +133,14 @@ class HousingPartnerResource extends Resource
                     }),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\ViewAction::make()
+                    ->iconButton()
+                    ->icon('heroicon-s-eye')
+                    ->color('info')
+                    ->tooltip('Detail'),
+                Tables\Actions\EditAction::make()
+                    ->iconButton()
+                    ->tooltip('Edit'),
                 Tables\Actions\DeleteAction::make()
                     ->requiresConfirmation()
                     ->action(function ($record) {
@@ -149,7 +155,10 @@ class HousingPartnerResource extends Resource
                             ->success()
                             ->body('The record has been successfully deleted.')
                             ->send();
-                    }),
+                    })
+                    ->iconButton()
+                    ->tooltip('Delete')
+                    ->requiresConfirmation(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

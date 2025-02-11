@@ -10,16 +10,5 @@ use Storage;
 
 class EditHeroImages extends EditRecord
 {
-
-
     protected static string $resource = HeroImagesResource::class;
-
-    protected function getHeaderActions(): array
-    {
-        return [
-            Actions\DeleteAction::make(),
-        ];
-    }
-
-
 }
