@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\UserSubmissionRequest;
 use App\Mail\SendReferralCode;
+use App\Mail\SendUserSubmission;
+use App\Models\Content;
 use App\Models\HousingPartner;
 use App\Models\UserSubmission;
 use Illuminate\Support\Facades\Cache;
@@ -67,7 +69,6 @@ class SubmissionController extends Controller
             array_push($finalIncomes, $income);
         }
 
-
         // Saving data to databases
         try {
             DB::beginTransaction();
@@ -78,10 +79,17 @@ class SubmissionController extends Controller
 
             if ($userSubmission && $createIncomes) {
                 $userSubmission->housingPartner()->decrement('available');
+
                 DB::commit();
                 Cache::forget('index-housing-list');
+
+                $content = Content::first(['contact_email']);
                 Mail::to($userSubmission->email)->send(
                     (new SendReferralCode($userSubmission->name, $userSubmission->referral_code, $userSubmission->housingPartner()->first(['name'])->name))->afterCommit()
+                );
+
+                Mail::to($content->contact_email)->send(
+                    (new SendUserSubmission($userSubmission->load('housingPartner', 'incomes')->toArray()))->afterCommit()
                 );
 
                 return view('submissions.complete')->with('referralCode', $referralCode);

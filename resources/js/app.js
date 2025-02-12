@@ -2,10 +2,11 @@ import "flowbite";
 import "../css/app.css";
 
 const loadingContent = `
-                            <div
-                            class="px-3 py-1 text-xs font-medium leading-none text-center text-blue-800 bg-blue-200 rounded-full animate-pulse dark:bg-blue-900 dark:text-blue-200">
-                            Loading...</div>
+<div
+class="px-3 py-1 text-xs font-medium leading-none text-center text-blue-800 bg-blue-200 rounded-full animate-pulse dark:bg-blue-900 dark:text-blue-200">
+Loading...</div>
 `;
+
 const fetchingFAQ = () => {
     const btnNextButton = $("#btn-next-button");
     btnNextButton.attr("disabled", "true");
@@ -54,14 +55,7 @@ function startLoadingState() {
     }
 }
 
-$(document).ready(function () {
-    startLoadingState();
-
-    $("#btn-next-button").click(() => {
-        fetchingFAQ();
-    });
-
-    // Create a timeline
+function StartUpGSAP() {
     let tl = gsap.timeline({
         delay: 0.5,
         paused: false, // default is false
@@ -119,11 +113,72 @@ $(document).ready(function () {
         y: 10,
     });
 
-    // tl2.to("#text-souvenir-1", {
-    //     scale: 1.1,
-    // });
+    const highlight = $(".highlight-1");
 
-    // tl2.to("#text-souvenir-2", {
-    //     scale: 1.1,
-    // });
+    gsap.to(".highlight-1", {
+        scrollTrigger: {
+            trigger: ".highlight-1",
+            toggleAction: "restart none reverse none",
+        },
+        keyframes: [
+            // { y: -20, duration: 1, ease: "power4.inOut" },
+            { y: -20, opacity: 1, duration: 1, ease: "power4.inOut" },
+            {
+                scale: 1.5,
+                duration: 1,
+                padding: "3rem",
+                ease: "power4.inOut",
+            },
+            {
+                scale: 1,
+                duration: 1,
+                padding: "0rem",
+                delay: 1,
+                ease: "power4.inOut",
+            },
+            { y: 0, opacity: 0, duration: 1, ease: "power4.inOut" },
+        ],
+        repeat: -1,
+        repeatDelay: 4,
+    });
+
+    gsap.to(".highlight-2", {
+        scrollTrigger: {
+            trigger: ".highlight-2",
+            toggleAction: "restart none reverse none",
+        },
+        keyframes: [
+            // { y: -20, duration: 1, ease: "power4.inOut" },
+            { y: 40, opacity: 1, duration: 1, ease: "power4.inOut" },
+            {
+                scale: 1.5,
+                duration: 1,
+                padding: "3rem",
+                ease: "power4.inOut",
+            },
+            {
+                scale: 1,
+                duration: 1,
+                padding: "0rem",
+                delay: 1,
+                ease: "power4.inOut",
+            },
+            { y: 0, opacity: 0, duration: 1, ease: "power4.inOut" },
+        ],
+        repeat: -1,
+        delay: 4,
+        repeatDelay: 4,
+    });
+}
+
+$(document).ready(function () {
+    gsap.registerPlugin(ScrollTrigger);
+    startLoadingState();
+
+    $("#btn-next-button").click(() => {
+        fetchingFAQ();
+    });
+
+    // Create a timeline
+    StartUpGSAP();
 });
