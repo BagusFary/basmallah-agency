@@ -107,9 +107,11 @@ function checkEmployementStatus(el) {
     }
 
     if (!$("#self_employees").is(":checked")) {
+        $('#self_income_title').html('Jumlah Penghasilan Pribadi')
         showSelfEmployeeInput(false);
         showNotSelfEmployeeInput(true,inputId);
     } else {
+        $('#self_income_title').html('Jumlah Penghasilan Pribadi (Kosongi bila tidak ada)')
         showSelfEmployeeInput(true);
         showNotSelfEmployeeInput(false,inputId);
     }

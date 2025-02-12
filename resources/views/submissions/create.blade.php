@@ -41,7 +41,7 @@
                             value="{{ old('avg_monthly_turnover') ?? '0' }}">
                         <input type="hidden" id="join_husband" name="join_husband" value="{{ old('join_husband') }}">
                         <input type="hidden" id="join_wife" name="join_wife" value="{{ old('join_wife') }}">
-                        <input type="hidden" id="self_income" name="self_income" value="{{ old('self_income') }}">
+                        <input type="hidden" id="self_income" name="self_income" value="{{ old('self_income', 0) }}">
                         <div>
                             <label for="email"
                                 class="block mb-2 text-sm font-medium text-vintage-dark dark:text-white">Email *</label>
@@ -191,7 +191,7 @@
                             </div>
                         </div>
                         <div id="self_income_section">
-                            <label for="self_income_input"
+                            <label for="self_income_input" id="self_income_title"
                                 class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Jumlah Penghasilan
                                 Pribadi</label>
                             <input type="text" inputmode="numeric" name="self_income_input" id="self_income_input"

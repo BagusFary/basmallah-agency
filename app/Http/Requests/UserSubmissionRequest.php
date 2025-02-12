@@ -57,7 +57,10 @@ class UserSubmissionRequest extends FormRequest
             ],
             'self_income' => [
                 'numeric',
-                Rule::when($this->salary == 'personal_income', ['min:1', 'max_digits:9'])
+                Rule::when(
+                    $this->employment_status != 'self_employees' && $this->salary != 'joint_income',
+                    ['required', 'min:1', 'max_digits:9']
+                ),
             ]
         ];
     }
