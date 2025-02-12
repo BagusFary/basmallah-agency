@@ -22,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('housing_partners', function (Blueprint $table) {
-            $table->string('instagram')->nullable()->after('email');
+            $table->dropColumn('instagram');
         });
     }
 };
