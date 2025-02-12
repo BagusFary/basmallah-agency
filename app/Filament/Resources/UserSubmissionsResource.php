@@ -25,6 +25,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Collection;
 use App\Filament\Resources\UserSubmissionsResource\Pages;
 use App\Filament\Resources\UserSubmissionsResource\RelationManagers;
+use App\Filament\Resources\UserSubmissionsResource\Widgets\StatsOverview;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\Indicator;
 use Filament\Tables\Filters\SelectFilter;
@@ -35,6 +36,7 @@ class UserSubmissionsResource extends Resource
     protected static ?string $model = UserSubmission::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+
 
     public static function form(Form $form): Form
     {
@@ -424,7 +426,7 @@ class UserSubmissionsResource extends Resource
                                     ->columnSpan(2)
                                     ->schema(fn(UserSubmission $record) => $record ? static::getIncome($record) : []),
                             ])->columns(2)
-                    ]),
+                    ])
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

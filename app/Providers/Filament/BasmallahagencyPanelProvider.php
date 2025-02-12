@@ -2,6 +2,8 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Resources\UserSubmissionsResource\Widgets\CardUserSubmission;
+use App\Filament\Resources\UserSubmissionsResource\Widgets\StatsOverview;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -54,6 +56,10 @@ class BasmallahagencyPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
+            ])
+            ->widgets([
+                StatsOverview::class,
+                CardUserSubmission::class,
             ]);
     }
 }
