@@ -35,6 +35,8 @@ use Filament\Forms\Components\CheckboxList;
 use Filament\Tables\Columns\CheckboxColumn;
 use Illuminate\Database\Eloquent\Collection;
 use App\Filament\Resources\UserSubmissionsResource\Pages;
+use App\Filament\Resources\UserSubmissionsResource\RelationManagers;
+use App\Filament\Resources\UserSubmissionsResource\Widgets\StatsOverview;
 use Malzariey\FilamentDaterangepickerFilter\Fields\DateRangePicker;
 use App\Filament\Resources\UserSubmissionResource\Widgets\StatsOverview;
 use App\Filament\Resources\UserSubmissionsResource\Widgets\StatsOverview as WidgetsStatsOverview;
@@ -44,6 +46,7 @@ class UserSubmissionsResource extends Resource
     protected static ?string $model = UserSubmission::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-document-duplicate';
+
 
     public static function form(Form $form): Form
     {
@@ -505,6 +508,9 @@ class UserSubmissionsResource extends Resource
                                     ->columnSpan(2)
                                     ->schema(fn(UserSubmission $record) => $record ? static::getIncome($record) : []),
                             ])->columns(2)
+<<<<<<< app/Filament/Resources/UserSubmissionsResource.php
+                    ])
+=======
                                 ]),
                 Tables\Actions\EditAction::make()
                 ->iconButton()
@@ -526,6 +532,7 @@ class UserSubmissionsResource extends Resource
                     ->body('The record has been successfully deleted.')
                     ->send();
                 })
+>>>>>>> app/Filament/Resources/UserSubmissionsResource.php
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
