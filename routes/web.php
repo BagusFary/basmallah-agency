@@ -2,10 +2,16 @@
 
 use App\Http\Controllers\LandingPage\IndexController;
 use App\Http\Controllers\SubmissionController;
+use App\Models\UserSubmission;
 use Illuminate\Support\Facades\Route;
 
 Route::controller(IndexController::class)->group(function () {
     Route::get('/', 'index');
+});
+
+Route::get('/sendemail', function() {
+    $userSubmission = UserSubmission::latest()->first()->load('housingPartner', 'incomes');
+    return new App\Mail\SendUserSubmission($userSubmission->toArray());
 });
 
 Route::prefix('housing-partners')->name('housing-partners.')->group(function () {

@@ -23,11 +23,16 @@
                 <h1 class="text-2xl font-semibold">Submission Berhasil!</h1>
                 <span>Selamat! Anda mendapatkan kode referral dari melakukan submission. Berikut adalah kode referral
                     anda.</span>
+                <hr class="my-3">
+                <span id="clipboard-success" class="text-green-400 text-center hidden">Kode Berhasil Disalin!</span>
                 <span onclick="clipboardClick()"
                     class="bg-vintage-brem cursor-pointer rounded tracking-wide p-3 text-white px-3 py-4 text-center">
                     <span id="code-referral-clipboard">{{ $referralCode ?? 'Kode Referral' }}</span>
                 </span>
-                <span id="clipboard-success" class="text-green-400 text-center hidden">Kode Berhasil Disalin!</span>
+                <hr class="my-3">
+                <p class="font-bold">
+                    Tenang saja! Tim kami akan segera menghubungi anda.
+                </p>
                 <p class="text-sm font-tint">
                     Note : <br>Kode Referral akan dikirimkan melalui email.
                 </p>
