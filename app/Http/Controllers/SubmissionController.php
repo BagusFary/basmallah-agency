@@ -30,6 +30,14 @@ class SubmissionController extends Controller
             return abort('403');
         }
 
+        $housingPartnerEmptyAvailable = HousingPartner::where('id', $id)
+            ->where('available', '<=', 0)
+            ->exists();
+
+        if ($housingPartnerEmptyAvailable) {
+            return back()->withInput()->with('error', 'Ketersediaan rumah sudah habis. Silahkan hubungi pihak terkait untuk informasi lebih lanjut.');
+        }
+
         $date = date('Ymd');
         $randomNumber = rand(100000, 999999);
         $referralCode = strtoupper("{$request['code']}-{$date}-{$randomNumber}");
@@ -79,7 +87,7 @@ class SubmissionController extends Controller
                 return view('submissions.complete')->with('referralCode', $referralCode);
             } else {
                 DB::rollBack();
-                return view('submissions.create')->with('error', 'Pendaftaran gagal , Mohon coba lagi nanti');
+                return back()->withInput()->with('error', 'Pendaftaran gagal , Mohon coba lagi nanti');
             }
         } catch (\Error $error) {
             DB::rollBack();

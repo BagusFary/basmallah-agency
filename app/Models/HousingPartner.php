@@ -42,6 +42,9 @@ class HousingPartner extends Model
             if ($housingPartner->image_url && $filamentStorage->exists($housingPartner->image_url)) {
                 $filamentStorage->delete($housingPartner->image_url);
             }
+
+            Cache::forget('index-housing-partners');
+            Cache::forget('index-housing-list');
         });
     }
 

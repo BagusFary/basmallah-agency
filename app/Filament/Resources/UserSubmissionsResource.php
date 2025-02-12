@@ -352,11 +352,11 @@ class UserSubmissionsResource extends Resource
                                     Radio::make('has_instalment')
                                         ->label('Punya Cicilan')
                                         ->options([
-                                            "1" => 'Ya', 
+                                            "1" => 'Ya',
                                             "0" => 'Tidak'
                                         ])
                                         ->inline()
-                                        ->inlineLabel(false) 
+                                        ->inlineLabel(false)
                                         ->live(),
                                         Section::make('Jumlah Cicilan')
                                         ->schema([
@@ -421,7 +421,7 @@ class UserSubmissionsResource extends Resource
                             return Excel::download(new UserSubmissionsExport($data), 'Rekap User Submission - ' . now()->format('Ymd_His') . '.xlsx');
                         })
                         ->modalSubmitActionLabel('Export')
-                        ->modalCancelActionLabel('Batal')                      
+                        ->modalCancelActionLabel('Batal')
             ])
             ->actions([
                 Tables\Actions\Action::make('detail')
@@ -516,7 +516,9 @@ class UserSubmissionsResource extends Resource
                 ->tooltip('Delete')
                 ->action(function (UserSubmission $record){
                     Income::where('user_submission_id', $record->id)->delete();
-                    UserSubmission::where('id', $record->id)->delete();
+                    $query = UserSubmission::where('id', $record->id);
+                    $query->first()->housingPartner()->increment('available');
+                    $query->delete();
 
                     Notification::make()
                     ->title('Delete Success')
