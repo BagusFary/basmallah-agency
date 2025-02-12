@@ -66,6 +66,9 @@ class HousingPartnerResource extends Resource
                     ->required()
                     ->maxLength(255)
                     ->unique(ignoreRecord: true),
+                Forms\Components\TextInput::make('instagram')
+                ->label('Username Instagram')
+                ->required(),
                 Forms\Components\TextInput::make('booking_fee')
                     ->label('Booking Fee')
                     ->prefix('Rp.')
