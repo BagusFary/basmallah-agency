@@ -2,26 +2,26 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\HeroImagesResource\Pages;
-use App\Models\HeroImage;
 use Cache;
-use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Hidden;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Columns\ImageColumn;
+use Filament\Forms\Form;
+use App\Models\HeroImage;
 use Filament\Tables\Table;
-use Illuminate\Support\Facades\Auth;
-use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
-use Storage;
 use Symfony\Component\Uid\Ulid;
+use Filament\Resources\Resource;
+use Illuminate\Support\Facades\Auth;
+use Filament\Forms\Components\Hidden;
+use Illuminate\Support\Facades\Storage;
+use Filament\Tables\Columns\ImageColumn;
+use Filament\Forms\Components\FileUpload;
+use App\Filament\Resources\HeroImagesResource\Pages;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class HeroImagesResource extends Resource
 {
     protected static ?string $model = HeroImage::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-photo';
 
     protected static ?string $navigationGroup = 'Contents';
 
@@ -60,9 +60,18 @@ class HeroImagesResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\ViewAction::make()
+                ->iconButton()
+                ->icon('heroicon-s-eye')
+                ->color('info')
+                ->tooltip('Detail'),
+                Tables\Actions\EditAction::make()
+                ->iconButton()
+                ->tooltip('Edit'),
                 Tables\Actions\DeleteAction::make()
-                    ->requiresConfirmation(),
+                ->iconButton()
+                ->tooltip('Delete')
+                ->requiresConfirmation(),
 
             ])
             ->bulkActions([

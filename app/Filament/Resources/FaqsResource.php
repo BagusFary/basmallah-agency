@@ -21,13 +21,15 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
 
+use function Livewire\before;
+
 class FaqsResource extends Resource
 {
     protected static ?string $model = FAQ::class;
 
     protected static ?string $navigationGroup = 'Contents';
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-question-mark-circle';
 
     protected static ?string $breadcrumb = 'FAQs';
 
@@ -69,15 +71,30 @@ class FaqsResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\ViewAction::make()
+                ->iconButton()
+                ->icon('heroicon-s-eye')
+                ->color('info')
+                ->tooltip('Detail'),
+                Tables\Actions\EditAction::make()
+                ->iconButton()
+                ->tooltip('Edit'),
+                Tables\Actions\DeleteAction::make()
+                ->iconButton()
+                ->tooltip('Delete')
+                ->requiresConfirmation(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->action(function ($records) {
+                            $faqIds = $records->pluck('id');
+                            FAQ::whereIn('id', $faqIds)->delete();
+                        })
+                        ->deselectRecordsAfterCompletion(),
                 ]),
             ])
-            ->emptyStateHeading('FAQ No Exists');
+            ->emptyStateHeading("FAQ doesn't exists.");
     }
 
     public static function getRelations(): array

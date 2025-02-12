@@ -1,10 +1,10 @@
 let housingPartnerCode = "";
-
+let token = "";
 $("input[name='employment_status']").on("change", checkEmployementStatus);
 $("input[name='salary']").on("change", checkIncomeStatus);
 $("input[name='has_instalment']").on("change", checkInstalmentStatus);
 
-$("#join_husband_input, #join_wife_input").keyup(function (event) {
+$("#join_husband_input, #join_wife_input").on("input", function (event) {
     validatePriceInput(event);
     updateTotalIncome();
 });
@@ -24,10 +24,15 @@ $(
 $("#submit-submission").on("click", function (event) {
     event.preventDefault();
     const elementCode = document.createElement("input");
+    const elementToken = document.createElement("input");
+    elementToken.name = "_token";
+    elementToken.value = token;
+    elementToken.type = "hidden";
     elementCode.name = "code";
     elementCode.value = housingPartnerCode;
     elementCode.type = "hidden";
     $("#form-submission").append(elementCode);
+    $("#form-submission").append(elementToken);
     $("#form-submission").submit();
 });
 
@@ -146,26 +151,35 @@ function clipboardClick() {
     $("#clipboard-success").show();
 }
 
-$(document).ready(function () {
+function removeSensitiveField() {
+    token = $('input[name="_token"]').val();
+    $('input[name="_token"]').remove();
     housingPartnerCode = $("#code").val();
     $("#code").remove();
+}
+
+$(document).ready(function () {
+    removeSensitiveField();
     checkEmployementStatus();
     checkIncomeStatus();
     checkInstalmentStatus();
+    updateTotalIncome();
 });
 
 $(".share-button").on("click", async (event) => {
     try {
         const titleName = $("#title-name").text();
+
         const data = {
             title: "Form Submission | " + titleName,
             text: "Ambil rumah anda di Basmallah Agency!",
             url: $(".share-button").attr("id"),
         };
-        // return console.log(data);
+
         await navigator.share(data);
+
         $(".share-button").text("Sudah Dibagikan");
     } catch (err) {
-        $(".share-button").text("Error");
+        $(".share-button").text("Bagikan");
     }
 });

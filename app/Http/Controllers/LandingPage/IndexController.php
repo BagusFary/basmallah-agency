@@ -28,7 +28,7 @@ class IndexController extends Controller
 
         $housingPartners = Cache::rememberForever('index-housing-partners', function () {
             return DB::table('housing_partners')
-                ->limit(5, ['ask_question', 'answer', 'created_at'])
+                ->limit(3, ['ask_question', 'answer', 'created_at'])
                 ->get(['name'])
                 ->pluck('name');
         });
@@ -42,15 +42,24 @@ class IndexController extends Controller
                 ->get();
         });
 
-        $faqs = DB::table('faqs')
-            ->orderBy('created_at', 'desc')
-            ->cursorPaginate(5);
+        $query = DB::table('faqs')
+            ->orderBy('created_at', 'desc');
 
+        $faqs = $query->cursorPaginate(5);
+
+        // $SEOfaqs = $query->limit(5)->get(['ask_question', 'answer'])->toArray();
+
+        // $SEOfaqs = array_map(function ($data) {
+        //     return [
+        //         '@type' => 'Question',
+        //         'name' => $data->ask_question,
+        //         'acceptedAnswer' => [
+        //             '@type' => 'Answer',
+        //             'text' => $data->answer,
+        //         ],
+        //     ];
+        // }, $faqs->items());
         $housingPartnersTotal = count($housingPartners) ?? 1;
-
-        if ($housingPartnersTotal > 3) {
-            return 3;
-        }
 
         return view('index', compact('housingPartners', 'housingPartnersTotal', 'houseLists', 'faqs', 'heroImage'));
     }

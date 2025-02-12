@@ -2,40 +2,50 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Support\RawJs;
 use Filament\Tables;
+use App\Models\Income;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Filament\Support\RawJs;
+use App\Models\HousingPartner;
 use App\Models\UserSubmission;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\Action;
+use Filament\Tables\Filters\Filter;
 use Filament\Forms\Components\Radio;
 use Maatwebsite\Excel\Facades\Excel;
 use Filament\Forms\Components\Select;
+use Illuminate\Support\Facades\Cache;
 use App\Exports\UserSubmissionsExport;
 use Filament\Forms\Components\Section;
+use Filament\Tables\Filters\Indicator;
+use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\Repeater;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
+use Filament\Tables\Enums\FiltersLayout;
+use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
-use App\Models\HousingPartner;
-use App\Models\Income;
-use Illuminate\Support\Facades\Cache;
+use Filament\Tables\Filters\TernaryFilter;
+use Filament\Forms\Components\CheckboxList;
+use Filament\Tables\Columns\CheckboxColumn;
 use Illuminate\Database\Eloquent\Collection;
 use App\Filament\Resources\UserSubmissionsResource\Pages;
 use App\Filament\Resources\UserSubmissionsResource\RelationManagers;
 use App\Filament\Resources\UserSubmissionsResource\Widgets\StatsOverview;
-use Filament\Tables\Filters\Filter;
-use Filament\Tables\Filters\Indicator;
-use Filament\Tables\Filters\SelectFilter;
 use Malzariey\FilamentDaterangepickerFilter\Fields\DateRangePicker;
+use App\Filament\Resources\UserSubmissionResource\Widgets\StatsOverview;
+use App\Filament\Resources\UserSubmissionsResource\Widgets\StatsOverview as WidgetsStatsOverview;
 
 class UserSubmissionsResource extends Resource
 {
     protected static ?string $model = UserSubmission::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-document-duplicate';
 
 
     public static function form(Form $form): Form
@@ -128,38 +138,39 @@ class UserSubmissionsResource extends Resource
                 TextColumn::make('housingPartner.name')
                     ->label('Perumahan')
                     ->searchable(),
-                TextColumn::make('id_card')
-                    ->label('NIK')
-                    ->searchable(['email', 'address', 'phone', 'name', 'id_card',]),
+                TextColumn::make('referral_code')
+                    ->label('Kode Referral')
+                    ->searchable(),
                 TextColumn::make('name')
-                    ->label('Nama'),
-                TextColumn::make('email')
-                    ->label('Email'),
-                TextColumn::make('address')
-                    ->label('Alamat')
+                    ->label('Nama')
+                    ->searchable(),
+                TextColumn::make('phone')
+                    ->label('Nomor WhatsApp')
+                    ->searchable(),
 
             ])
             ->filters([
-                Filter::make('incomes.salary')
+                Filter::make('has_instalment')
+                    ->label('Punya Cicilan?')
                     ->form([
-                        Section::make('Penghasilan')
-                            ->collapsible()
-                            ->collapsed()
-                            ->schema([
-                                TextInput::make('minSalary')
-                                    ->label('Minimal Penghasilan')
-                                    ->numeric()
-                                    ->prefix('Rp.')
-                                    ->mask(RawJs::make('$money($input)')),
-                                TextInput::make('maxSalary')
-                                    ->label('Maksimal Penghasilan')
-                                    ->numeric()
-                                    ->prefix('Rp.')
-                                    ->mask(RawJs::make('$money($input)'))
-                            ]),
+                        DateRangePicker::make('createdAt')
+                            ->label('Rentang Tanggal')
+                            ->placeholder('Pilih Rentang Tanggal'),
+                        Radio::make('isCicilan')
+                            ->options([
+                                '1' => 'Punya',
+                                '0' => 'Tidak Punya'
+                            ])
+                            ->columns(2)
+                            ->label('Cicilan?')
+                            ->afterStateUpdated(function (?string $state, Set $set) {
+                                if ($state == '0') {
+                                    $set('minCicilan', null);
+                                    $set('maxCicilan', null);
+                                }
+                            })
+                            ->live(),
                         Section::make('Cicilan')
-                            ->collapsible()
-                            ->collapsed()
                             ->schema([
                                 TextInput::make('minCicilan')
                                     ->label('Minimal Cicilan')
@@ -172,18 +183,19 @@ class UserSubmissionsResource extends Resource
                                     ->prefix('Rp.')
                                     ->mask(RawJs::make('$money($input)'))
                             ])
+                            ->visible(function (Get $get) {
+                                return $get('isCicilan') ?? false;
+                            })
+                            ->columns(2)
                     ])
-                    ->indicateUsing(function (array $data): array {
+                    ->indicateUsing(function ($data) {
                         $indicator = [];
 
-                        if ($data['minSalary'] ?? null) {
-                            $indicator[] = Indicator::make('Minimal Penghasilan: Rp. ' .  $data['minSalary'])
-                                ->removeField('minSalary');
-                        }
-
-                        if ($data['maxSalary'] ?? null) {
-                            $indicator[] = Indicator::make('Maksimal Penghasilan: Rp. ' . $data['maxSalary'])
-                                ->removeField('maxSalary');
+                        if (isset($data['isCicilan'])) {
+                            $text = $data['isCicilan'] ? 'Punya' : 'Tidak Punya';
+                            $indicator[] = Indicator::make("$text Cicilan")
+                                // ->removeField('isCicilan')
+                                ->removable(false);
                         }
 
                         if ($data['minCicilan'] ?? null) {
@@ -199,12 +211,82 @@ class UserSubmissionsResource extends Resource
                         return $indicator;
                     })
                     ->query(function (Builder $query, array $data) {
+                        $query->when(isset($data['isCicilan']), function (Builder $query, $hasInstalment) use ($data) {
+                            $query->where('has_instalment', $data['isCicilan']);
+
+                            $query->when($data['isCicilan'] == '1', function (Builder $query) use ($data) {
+                                $query->when($data['minCicilan'] ?? null, function ($query, $minCicilan) {
+                                    $minCicilan = str_replace([','], '', $minCicilan ?? null);
+
+                                    $query->where('instalment_amount', '>=', $minCicilan);
+                                });
+                                $query->when($data['maxCicilan'] ?? null, function ($query, $maxCicilan) {
+                                    $maxCicilan = str_replace([','], '', $maxCicilan ?? null);
+
+                                    $query->where('instalment_amount', '<=', $maxCicilan);
+                                });
+                            });
+                        });
+
+                        $query->when(isset($data['createdAt']), function (Builder $query) use ($data) {
+                            $dates = explode(' - ', $data['createdAt']);
+                            $startDate = \Carbon\Carbon::createFromFormat('d/m/Y', trim($dates[0]))->startOfDay();
+                            $endDate = \Carbon\Carbon::createFromFormat('d/m/Y', trim($dates[1]))->endOfDay();
+                            $query->whereBetween('created_at', [$startDate, $endDate]);
+                        });
+
+                        return $query;
+                    })
+                    ->columns(2)
+                    ->columnSpanFull(),
+                SelectFilter::make('housing_partner_id')
+                    ->relationship(name: 'housingPartner', titleAttribute: 'name')
+                    ->native(false)
+                    ->label('Perumahan'),
+                SelectFilter::make('employment_status')
+                    ->options([
+                        'self_employees' => 'Wirausaha',
+                        'civil_servants' => 'PNS',
+                        'employees' => 'Karyawan'
+                    ])
+                    ->native(false)
+                    ->label('Status Pekerjaan'),
+                Filter::make('incomes.salary')
+                    ->form([
+                        Section::make('Penghasilan')
+                            ->schema([
+                                TextInput::make('minSalary')
+                                    ->label('Minimal Penghasilan')
+                                    ->numeric()
+                                    ->prefix('Rp.')
+                                    ->mask(RawJs::make('$money($input)')),
+                                TextInput::make('maxSalary')
+                                    ->label('Maksimal Penghasilan')
+                                    ->numeric()
+                                    ->prefix('Rp.')
+                                    ->mask(RawJs::make('$money($input)'))
+                            ])
+                            ->columns(2),
+                    ])
+                    ->indicateUsing(function (array $data): array {
+                        $indicator = [];
+
+                        if ($data['minSalary'] ?? null) {
+                            $indicator[] = Indicator::make('Minimal Penghasilan: Rp. ' .  $data['minSalary'])
+                                ->removeField('minSalary');
+                        }
+
+                        if ($data['maxSalary'] ?? null) {
+                            $indicator[] = Indicator::make('Maksimal Penghasilan: Rp. ' . $data['maxSalary'])
+                                ->removeField('maxSalary');
+                        }
+
+                        return $indicator;
+                    })
+                    ->query(function (Builder $query, array $data) {
                         $minSalary = str_replace([','], '', $data['minSalary'] ?? null);
                         $maxSalary = str_replace([','], '', $data['maxSalary'] ?? null);
-                        $minCicilan = str_replace([','], '', $data['minCicilan'] ?? null);
-                        $maxCicilan = str_replace([','], '', $data['maxCicilan'] ?? null);
                         return
-                            // dd($minSalary);
                             $query
                             ->when($minSalary ?? null, function ($query, $minSalary) {
                                 return $query->whereHas('incomes', function ($q) use ($minSalary) {
@@ -215,15 +297,11 @@ class UserSubmissionsResource extends Resource
                                 return $query->whereHas('incomes', function ($q) use ($maxSalary) {
                                     $q->selectRaw('SUM(salary) as total_salary')->having('total_salary', '<=', $maxSalary);
                                 });
-                            })
-                            ->when($minCicilan ?? null, function ($query, $minCicilan) {
-                                return $query->where('instalment_amount', '>=', $minCicilan);
-                            })
-                            ->when($maxCicilan ?? null, function ($query, $maxCicilan) {
-                                return $query->where('instalment_amount', '<=', $maxCicilan);
                             });
                     })
-            ])
+                    ->columnSpanFull()
+            ], layout: FiltersLayout::AboveContentCollapsible)
+            ->filtersFormColumns(2)
             ->deferLoading()
             ->headerActions([
                 Action::make('exportGlobal')
@@ -271,21 +349,21 @@ class UserSubmissionsResource extends Resource
                                             ->mask(RawJs::make('$money($input)'))
                                             ->stripCharacters(',')
                                             ->gt('avg_turnover_min'),
-                                    ])
-                                    ->columns(2)
-                                    ->visible(fn($get) => $get('employment_status') === 'self_employees'),
-                                Select::make('has_instalment')
-                                    ->label('Punya Cicilan')
-                                    ->placeholder('Apakah user memiliki cicilan?')
-                                    ->options([
-                                        "1" => 'Ya',
-                                        "0" => 'Tidak'
-                                    ])
-                                    ->native(false)
-                                    ->live(),
-                                Section::make('Jumlah Cicilan')
-                                    ->schema([
-                                        TextInput::make('instalment_amount_min')
+                                        ])
+                                        ->columns(2)
+                                        ->visible(fn ($get) => $get('employment_status') === 'self_employees'),
+                                    Radio::make('has_instalment')
+                                        ->label('Punya Cicilan')
+                                        ->options([
+                                            "1" => 'Ya', 
+                                            "0" => 'Tidak'
+                                        ])
+                                        ->inline()
+                                        ->inlineLabel(false) 
+                                        ->live(),
+                                        Section::make('Jumlah Cicilan')
+                                        ->schema([
+                                            TextInput::make('instalment_amount_min')
                                             ->label('Minimal')
                                             ->placeholder('Masukkan Minimal Cicilan')
                                             ->inputMode('numeric')
@@ -337,19 +415,23 @@ class UserSubmissionsResource extends Resource
                                             ->mask(RawJs::make('$money($input)'))
                                             ->stripCharacters(',')
                                             ->gt('salary_min'),
-                                    ])
-                                    ->columns(2)
-                            ])
-                            ->columns(2)
-                    ])
-                    ->action(function (array $data) {
-                        return Excel::download(new UserSubmissionsExport($data), 'RekapitulasiForm-' . now()->format('Ymd_His') . '.xlsx');
-                    })
-
+                                        ])
+                                        ->columns(2)
+                                ])
+                                ->columns(2)
+                        ])
+                        ->action( function(array $data){
+                            return Excel::download(new UserSubmissionsExport($data), 'Rekap User Submission - ' . now()->format('Ymd_His') . '.xlsx');
+                        })
+                        ->modalSubmitActionLabel('Export')
+                        ->modalCancelActionLabel('Batal')                      
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
                 Tables\Actions\Action::make('detail')
+                ->iconButton()
+                ->icon('heroicon-s-eye')
+                ->color('info')
+                ->tooltip('Detail')
                     ->form([
                         Section::make(fn(UserSubmission $record): string => $record->housingPartner->name)
                             ->schema([
@@ -426,7 +508,29 @@ class UserSubmissionsResource extends Resource
                                     ->columnSpan(2)
                                     ->schema(fn(UserSubmission $record) => $record ? static::getIncome($record) : []),
                             ])->columns(2)
+<<<<<<< app/Filament/Resources/UserSubmissionsResource.php
                     ])
+=======
+                                ]),
+                Tables\Actions\EditAction::make()
+                ->iconButton()
+                ->tooltip('Edit'),
+                Tables\Actions\DeleteAction::make()
+                ->iconButton()
+                ->icon('heroicon-s-trash')
+                ->color('danger')
+                ->tooltip('Delete')
+                ->action(function (UserSubmission $record){
+                    Income::where('user_submission_id', $record->id)->delete();
+                    UserSubmission::where('id', $record->id)->delete();
+
+                    Notification::make()
+                    ->title('Delete Success')
+                    ->success()
+                    ->body('The record has been successfully deleted.')
+                    ->send();
+                })
+>>>>>>> app/Filament/Resources/UserSubmissionsResource.php
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -475,7 +579,6 @@ class UserSubmissionsResource extends Resource
     {
         return [
             'index' => Pages\ListUserSubmissions::route('/'),
-            'create' => Pages\CreateUserSubmissions::route('/create'),
             'edit' => Pages\EditUserSubmissions::route('/{record}/edit'),
         ];
     }

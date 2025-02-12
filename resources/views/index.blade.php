@@ -51,9 +51,8 @@
 
                 </h1>
                 <p class="mb-4 max-w-2xl text-black dark:text-gray-400 md:mb-12 md:text-lg mb-3 lg:mb-5 lg:text-xl">
-                    Basmallah Agency merupakan salah satu agency perperti yang berkerjasama dengan perusahaan real estate
+                    Basmallah Agency merupakan salah satu agency properti yang berkerjasama dengan perusahaan real estate
                     dan developer terkemuka dan terpercaya di malang raya serta dikenal luas secara regional.
-
                 </p>
             </div>
             <div class="hidden md:col-span-5 md:mt-0 md:flex">
@@ -103,7 +102,7 @@
                         class="bg-white text-vintage-dark px-3 text-lg md:text-2xl font-bold uppercase text-center">Satu
                         Keluarga Dispenser Beras</span>
                 </div>
-                <div class="flex flex-col justify-center items-center">
+                <div class="flex flex-col justify-center items-center col-span-full">
                     <img id="souvenir-3" src="{{ asset('souvenir/souvenir (3).png') }}" class="scale-75 md:scale-75"
                         alt="">
                     <span id="text-souvenir-3"
@@ -128,11 +127,17 @@
                 </p>
             </div>
             <div class="grid gap-8 mb-6 lg:mb-16 md:grid-cols-2">
+                @if (count($houseLists) == 0)
+                    <div class="col-span-full">
+
+                        <h1 class="text-lg text-center text-vintage-dark font-bold">Perumahan Belum Tersedia</h1>
+                    </div>
+                @endif
                 @foreach ($houseLists as $house)
                     <article
                         class="flex flex-col md:flex-row border border-vintage-brem border-rounded drop-shadow-xl shadow-vintage-brem grid-rows-4 items-stretch bg-white rounded-lg">
                         <div class="relative">
-                            <img class="w-full md:max-w-64 h-[200px] object-center md:h-md md:rounded-lg sm:rounded-none rounded-t-lg md:rounded-b-md  object-cover"
+                            <img class="w-full md:min-w-64 md:max-w-64 h-[200px] object-center md:h-md md:rounded-lg sm:rounded-none rounded-t-lg md:rounded-b-md  object-cover"
                                 src="{{ asset("storage/$house->image_url") }}" alt="Bonnie Avatar">
                         </div>
                         <div class="">
@@ -192,6 +197,9 @@
             </div>
 
             <div class="mt-6 flow-root">
+                @if (empty($faqs->items()))
+                    <h1 class="text-white text-lg">FAQ belum tersedia.</h1>
+                @endif
                 <div id="content-faq" class="-my-6 divide-y divide-white dark:divide-gray-800">
                     @foreach ($faqs->items() as $faq)
                         <div class="space-y-4 py-6 md:py-8">
@@ -221,6 +229,25 @@
 
     </section>
 
-
+    @push('scripts')
+        <script type="application/ld+json">
+    {
+      "@context": "{{ URL::current() }}#faqs",
+      "@type": "FAQPage",
+      "mainEntity": [
+        @foreach ($faqs->items() as $faq)
+        {
+        "@type": "Question",
+        "name": "{{ $faq->ask_question }}",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "{{ $faq->answer }}"
+            }
+        }@if(!$loop->last),@endif
+        @endforeach
+      ]
+    }
+        </script>
+    @endpush
 
 @endsection

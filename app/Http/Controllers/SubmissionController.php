@@ -41,7 +41,6 @@ class SubmissionController extends Controller
             ...$validatedData
         ];
 
-        // dd($request->all());
         $incomes = [
             'self' => $validatedData['self_income'],
             'join-husband' => $validatedData['join_husband'],
@@ -73,7 +72,7 @@ class SubmissionController extends Controller
                 $userSubmission->housingPartner()->decrement('available');
                 DB::commit();
                 Cache::forget('index-housing-list');
-                Mail::to('losinto@gmail.com')->send(
+                Mail::to($userSubmission->email)->send(
                     (new SendReferralCode($userSubmission->name, $userSubmission->referral_code, $userSubmission->housingPartner()->first(['name'])->name))->afterCommit()
                 );
 
