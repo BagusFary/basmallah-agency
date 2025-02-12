@@ -129,13 +129,19 @@
             <div class="grid gap-8 mb-6 lg:mb-16 md:grid-cols-2">
                 @if (count($houseLists) == 0)
                     <div class="col-span-full">
-
                         <h1 class="text-lg text-center text-vintage-dark font-bold">Perumahan Belum Tersedia</h1>
                     </div>
                 @endif
                 @foreach ($houseLists as $house)
                     <article
-                        class="flex flex-col md:flex-row border border-vintage-brem border-rounded drop-shadow-xl shadow-vintage-brem grid-rows-4 items-stretch bg-white rounded-lg">
+                        class="flex flex-col relative md:flex-row border border-vintage-brem border-rounded drop-shadow-xl shadow-vintage-brem grid-rows-4 items-stretch bg-white rounded-lg">
+                        @if ($house->available < 1)
+                            <div class="bg-vintage-dark/70 w-full h-full z-40 absolute top-0 left-0">
+                                <h1 class="flex items-center w-full h-full justify-center text-white font-bold">Tidak
+                                    Tersedia</h1>
+                            </div>
+                        @endif
+
                         <div class="relative">
                             <img class="w-full md:min-w-64 md:max-w-64 h-[200px] object-center md:h-md md:rounded-lg sm:rounded-none rounded-t-lg md:rounded-b-md  object-cover"
                                 src="{{ asset("storage/$house->image_url") }}" alt="Bonnie Avatar">
@@ -232,7 +238,7 @@
     @push('scripts')
         <script type="application/ld+json">
     {
-      "@context": "{{ URL::current() }}#faqs",
+      "@context": "https://schema.org",
       "@type": "FAQPage",
       "mainEntity": [
         @foreach ($faqs->items() as $faq)

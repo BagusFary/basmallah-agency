@@ -101,10 +101,6 @@ class HousingPartnerResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('code')
                     ->searchable(),
-                // Tables\Columns\TextColumn::make('phone')
-                //     ->searchable(),
-                // Tables\Columns\TextColumn::make('email')
-                //     ->searchable(),
                 Tables\Columns\TextColumn::make('available')
                     ->numeric()
                     ->sortable()

@@ -22,6 +22,12 @@
                             Bagikan Form
                         </button>
                     </div>
+                    @if (session('error'))
+                        <div class="p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50 dark:bg-gray-800 dark:text-blue-400"
+                            role="alert">
+                            {{ session('error') }}
+                        </div>
+                    @endif
 
                     <form class="space-y-4 md:space-y-6" id="form-submission"
                         action="{{ route('housing-partners.store', $housingPartners->id) }}" method="post">

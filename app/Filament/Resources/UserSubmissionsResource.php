@@ -21,7 +21,6 @@ use Illuminate\Support\Facades\Cache;
 use App\Exports\UserSubmissionsExport;
 use Filament\Forms\Components\Section;
 use Filament\Tables\Filters\Indicator;
-use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\Repeater;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Columns\TextColumn;
@@ -30,17 +29,9 @@ use Filament\Notifications\Notification;
 use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
-use Filament\Tables\Filters\TernaryFilter;
-use Filament\Forms\Components\CheckboxList;
-use Filament\Tables\Columns\CheckboxColumn;
 use Illuminate\Database\Eloquent\Collection;
 use App\Filament\Resources\UserSubmissionsResource\Pages;
-use App\Filament\Resources\UserSubmissionsResource\RelationManagers;
-use App\Filament\Resources\UserSubmissionsResource\Widgets\StatsOverview;
 use Malzariey\FilamentDaterangepickerFilter\Fields\DateRangePicker;
-use App\Filament\Resources\UserSubmissionResource\Widgets\StatsOverview;
-use App\Filament\Resources\UserSubmissionsResource\Widgets\StatsOverview as WidgetsStatsOverview;
-
 class UserSubmissionsResource extends Resource
 {
     protected static ?string $model = UserSubmission::class;
@@ -349,21 +340,21 @@ class UserSubmissionsResource extends Resource
                                             ->mask(RawJs::make('$money($input)'))
                                             ->stripCharacters(',')
                                             ->gt('avg_turnover_min'),
-                                        ])
-                                        ->columns(2)
-                                        ->visible(fn ($get) => $get('employment_status') === 'self_employees'),
-                                    Radio::make('has_instalment')
-                                        ->label('Punya Cicilan')
-                                        ->options([
-                                            "1" => 'Ya', 
-                                            "0" => 'Tidak'
-                                        ])
-                                        ->inline()
-                                        ->inlineLabel(false) 
-                                        ->live(),
-                                        Section::make('Jumlah Cicilan')
-                                        ->schema([
-                                            TextInput::make('instalment_amount_min')
+                                    ])
+                                    ->columns(2)
+                                    ->visible(fn($get) => $get('employment_status') === 'self_employees'),
+                                Radio::make('has_instalment')
+                                    ->label('Punya Cicilan')
+                                    ->options([
+                                        "1" => 'Ya',
+                                        "0" => 'Tidak'
+                                    ])
+                                    ->inline()
+                                    ->inlineLabel(false)
+                                    ->live(),
+                                Section::make('Jumlah Cicilan')
+                                    ->schema([
+                                        TextInput::make('instalment_amount_min')
                                             ->label('Minimal')
                                             ->placeholder('Masukkan Minimal Cicilan')
                                             ->inputMode('numeric')
@@ -415,23 +406,23 @@ class UserSubmissionsResource extends Resource
                                             ->mask(RawJs::make('$money($input)'))
                                             ->stripCharacters(',')
                                             ->gt('salary_min'),
-                                        ])
-                                        ->columns(2)
-                                ])
-                                ->columns(2)
-                        ])
-                        ->action( function(array $data){
-                            return Excel::download(new UserSubmissionsExport($data), 'Rekap User Submission - ' . now()->format('Ymd_His') . '.xlsx');
-                        })
-                        ->modalSubmitActionLabel('Export')
-                        ->modalCancelActionLabel('Batal')                      
+                                    ])
+                                    ->columns(2)
+                            ])
+                            ->columns(2)
+                    ])
+                    ->action(function (array $data) {
+                        return Excel::download(new UserSubmissionsExport($data), 'Rekap User Submission - ' . now()->format('Ymd_His') . '.xlsx');
+                    })
+                    ->modalSubmitActionLabel('Export')
+                    ->modalCancelActionLabel('Batal')
             ])
             ->actions([
                 Tables\Actions\Action::make('detail')
-                ->iconButton()
-                ->icon('heroicon-s-eye')
-                ->color('info')
-                ->tooltip('Detail')
+                    ->iconButton()
+                    ->icon('heroicon-s-eye')
+                    ->color('info')
+                    ->tooltip('Detail')
                     ->form([
                         Section::make(fn(UserSubmission $record): string => $record->housingPartner->name)
                             ->schema([
@@ -508,29 +499,27 @@ class UserSubmissionsResource extends Resource
                                     ->columnSpan(2)
                                     ->schema(fn(UserSubmission $record) => $record ? static::getIncome($record) : []),
                             ])->columns(2)
-<<<<<<< app/Filament/Resources/UserSubmissionsResource.php
-                    ])
-=======
-                                ]),
+                    ]),
                 Tables\Actions\EditAction::make()
-                ->iconButton()
-                ->tooltip('Edit'),
+                    ->iconButton()
+                    ->tooltip('Edit'),
                 Tables\Actions\DeleteAction::make()
-                ->iconButton()
-                ->icon('heroicon-s-trash')
-                ->color('danger')
-                ->tooltip('Delete')
-                ->action(function (UserSubmission $record){
-                    Income::where('user_submission_id', $record->id)->delete();
-                    UserSubmission::where('id', $record->id)->delete();
+                    ->iconButton()
+                    ->icon('heroicon-s-trash')
+                    ->color('danger')
+                    ->tooltip('Delete')
+                    ->action(function (UserSubmission $record) {
+                        Income::where('user_submission_id', $record->id)->delete();
+                        $query = UserSubmission::where('id', $record->id);
+                        $query->first()->housingPartner()->increment('available');
+                        $query->delete();
 
-                    Notification::make()
-                    ->title('Delete Success')
-                    ->success()
-                    ->body('The record has been successfully deleted.')
-                    ->send();
-                })
->>>>>>> app/Filament/Resources/UserSubmissionsResource.php
+                        Notification::make()
+                            ->title('Delete Success')
+                            ->success()
+                            ->body('The record has been successfully deleted.')
+                            ->send();
+                    })
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
