@@ -2,7 +2,6 @@
 
 namespace App\Providers\Filament;
 use App\Filament\Resources\UserSubmissionsResource\Widgets\CardUserSubmission;
-use App\Filament\Resources\UserSubmissionsResource\Widgets\StatsOverview;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\Widgets;
@@ -40,8 +39,6 @@ class BasmallahagencyPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
-                // Widgets\AccountWidget::class,
-                // Widgets\FilamentInfoWidget::class,
                 StatsOverview::class,
             ])
             ->middleware([
@@ -57,10 +54,6 @@ class BasmallahagencyPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
-            ])
-            ->widgets([
-                StatsOverview::class,
-                CardUserSubmission::class,
             ]);
     }
 }
