@@ -64,38 +64,52 @@ class UserSubmissionsResource extends Resource
                         'employees' => 'Karyawan'
                     ])
                     ->native(false)
-                    ->label('Status Pekerjaan'),
+                    ->label('Status Pekerjaan')
+                    ->live(),
                 TextInput::make('avg_monthly_turnover')
                     ->numeric()
-                    ->label('Omset Rata-Rata Bulanan'),
+                    ->label('Omset Rata-Rata Bulanan')
+                    ->visible(fn($get) => $get('employment_status') === 'self_employees'),
+                TextInput::make('workplace')
+                    ->label(fn($get) => $get('employment_status') === 'civil_servants' ? 'Tempat Tugas Bekerja' : 'Tempat Bekerja')
+                    ->visible(fn($get) => $get('employment_status') === 'employees' || $get('employment_status') === 'civil_servants' ),
+                TextInput::make('field_of_work')
+                    ->label('Bidang Pekerjaan')
+                    ->visible(fn($get) => $get('employment_status') === 'employees' || $get('employment_status') === 'civil_servants' ),
                 Radio::make('has_instalment')
                     ->options([
-                        '1' => 'Yes',
-                        '0' => 'No'
+                        '1' => 'Ya',
+                        '0' => 'Tidak'
                     ])
-                    ->label('Punya Cicilan?'),
+                    ->inline()
+                    ->inlineLabel(false)
+                    ->label('Punya Cicilan?')
+                    ->live(),
                 TextInput::make('instalment_amount')
-                    ->label('Jumlah Cicilan'),
+                    ->label('Jumlah Cicilan')
+                    ->visible(fn($get) => $get('has_instalment') == '1'),
                 TextInput::make('referral_code')
                     ->label('Kode Referal'),
-                Repeater::make('Income')
-                    ->label('Penghasilan')
+                Section::make('Penghasilan')
                     ->schema([
-                        Select::make('type')
-                            ->options([
-                                'self' => 'Sendiri',
-                                'Join Income' => [
-                                    'join-husband' => 'Gaji Suami',
-                                    'join-wife' => 'Gaji Istri'
-                                ]
-
-                            ]),
-                        TextInput::make('salary')
-                            ->numeric()
+                        Repeater::make('incomes')
+                            ->schema([
+                                Select::make('type')
+                                    ->options([
+                                        'self' => 'Sendiri',
+                                        'Join Income' => [
+                                            'join-husband' => 'Gaji Suami',
+                                            'join-wife' => 'Gaji Istri'
+                                        ]
+        
+                                    ]),
+                                TextInput::make('salary')
+                                    ->numeric()
+                            ])
+                            ->relationship('incomes')
+                            ->defaultItems(1)
                     ])
-                    ->relationship('incomes')
-                    ->defaultItems(1)
-            ]);
+                ]);
     }
 
     protected static function getIncome(UserSubmission $model)
@@ -418,91 +432,11 @@ class UserSubmissionsResource extends Resource
                     ->modalCancelActionLabel('Batal')
             ])
             ->actions([
-                Tables\Actions\Action::make('detail')
+                Tables\Actions\ViewAction::make()
                     ->iconButton()
                     ->icon('heroicon-s-eye')
                     ->color('info')
-                    ->tooltip('Detail')
-                    ->form([
-                        Section::make(fn(UserSubmission $record): string => $record->housingPartner->name)
-                            ->schema([
-                                TextInput::make('id_card')
-                                    ->default(fn(UserSubmission $record): string => $record->id_card)
-                                    ->readOnly()
-                                    ->label('NIK')
-                                    ->extraAttributes([
-                                        'class' => '!border-none !ring-0 !focus:ring-0 !focus:border-none',
-                                    ]),
-                                TextInput::make('name')
-                                    ->default(fn(UserSubmission $record): string => $record->name)
-                                    ->readOnly()
-                                    ->label('Nama'),
-                                TextInput::make('email')
-                                    ->default(fn(UserSubmission $record): string => $record->email)
-                                    ->readOnly()
-                                    ->label('Email'),
-                                TextInput::make('address')
-                                    ->default(fn(UserSubmission $record): string => $record->address)
-                                    ->readOnly()
-                                    ->label('Alamat'),
-                                TextInput::make('employment_status')
-                                    ->default(function (UserSubmission $record) {
-                                        $getEmployee = $record->employment_status;
-                                        if ($getEmployee === 'self_employees')
-                                            return 'Wirausaha';
-                                        if ($getEmployee === 'civil_servants')
-                                            return 'PNS';
-                                        if ($getEmployee === 'employees')
-                                            return 'Karyawan';
-                                    })
-                                    ->readOnly()
-                                    ->label('Status Pekerjaan'),
-                                TextInput::make('avg_monthly_turnover')
-                                    ->default(fn(UserSubmission $record): string => $record->avg_monthly_turnover)
-                                    ->readOnly()
-                                    ->label('Omset Bulanan Rata-Rata')
-                                    ->visible(function (UserSubmission $record) {
-                                        $getEmployee = $record->employment_status;
-                                        return $getEmployee === 'self_employees' ? true : false;
-                                    })
-                                    ->prefix('Rp.')
-                                    ->mask(RawJs::make('$money($input)')),
-                                TextInput::make('has_instalment')
-                                    ->default(fn(UserSubmission $record): string => $record->has_instalment === 0 ? 'Tidak' : '')
-                                    ->readOnly()
-                                    ->label('Punya Cicilan?')
-                                    ->visible(function (UserSubmission $record) {
-                                        $getInstalment = $record->has_instalment;
-                                        return $getInstalment === 0 ? true : false;
-                                    }),
-                                TextInput::make('instalment_amount')
-                                    ->default(fn(UserSubmission $record): string => $record->instalment_amount)
-                                    ->readOnly()
-                                    ->label('Total Cicilan')
-                                    ->visible(function (UserSubmission $record) {
-                                        $getInstalment = $record->has_instalment;
-                                        return $getInstalment === 1 ? true : false;
-                                    })
-                                    ->prefix('Rp.')
-                                    ->mask(RawJs::make('$money($input)')),
-                                TextInput::make('type')
-                                    ->default(fn(UserSubmission $record): string => $record->incomes[0]->type === 'self' ? 'Pribadi' : 'Join Income')
-                                    ->readOnly()
-                                    ->columnSpan(2)
-                                    ->label('Tipe Penghasilan'),
-
-                                Repeater::make('Income')
-                                    ->label('Penghasilan')
-                                    ->deletable(false)
-                                    ->addable(false)
-                                    ->reorderable(false)
-                                    ->columnSpan(2)
-                                    ->schema(fn(UserSubmission $record) => $record ? static::getIncome($record) : []),
-                            ])->columns(2)
-                    ]),
-                Tables\Actions\EditAction::make()
-                    ->iconButton()
-                    ->tooltip('Edit'),
+                    ->tooltip('Detail'),
                 Tables\Actions\DeleteAction::make()
                     ->iconButton()
                     ->icon('heroicon-s-trash')
