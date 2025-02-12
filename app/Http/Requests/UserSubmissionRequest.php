@@ -29,7 +29,15 @@ class UserSubmissionRequest extends FormRequest
             'address' => 'required|max:255',
             'phone' => 'required|unique:user_submissions|max_digits:20',
             'employment_status' => 'required|in:self_employees,civil_servants,employees',
-            'self_employee_as' => 'max:255',
+            'self_employee_as' => [
+                Rule::when($this->employment_status == 'self_employees',['required','max:255'])
+            ],
+            'workplace' => [
+                Rule::when($this->employment_status == 'civil_servants' || $this->employment_status == 'employees', ['required', 'max:255'])
+            ],
+            'field_of_work' => [
+                Rule::when($this->employment_status == 'civil_servants' || $this->employment_status == 'employees', ['required', 'max:255'])
+            ],
             'has_instalment' => 'required|in:1,0',
             'instalment_amount' => [
                 'numeric',
@@ -63,6 +71,8 @@ class UserSubmissionRequest extends FormRequest
             'address' => 'Alamat',
             'phone' => 'Nomor WhatsApp',
             'self_employee_as' => 'Bidang Wirausaha',
+            'workplace' => $this->employment_status === 'civil_servants' ? 'Tempat Tugas Bekerja' : 'Tempat Bekerja',
+            'field_of_work' => 'Bidang Pekerjaan',
             'instalment_amount' => 'Jumlah Cicilan',
             'avg_monthly_turnover' => 'Omset Perbulan',
             'join_husband' => 'Penghasilan Suami',

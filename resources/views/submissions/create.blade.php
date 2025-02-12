@@ -120,7 +120,7 @@
                             </div>
                             <div class="flex items-center my-2">
                                 <input {{ old('employment_status', 'false') == 'employees' ? 'checked' : '' }}
-                                    id="employee" type="radio" value="employees" name="employment_status"
+                                    id="employees" type="radio" value="employees" name="employment_status"
                                     class="w-4 h-4 text-vintage-dark bg-vintage-light border-vintage-dark focus:ring-vintage-dark focus:ring-2">
                                 <label for="employee"
                                     class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Pegawai
@@ -148,6 +148,26 @@
                                 class="bg-vintage-light border border-vintage-brem text-vintage-dark text-sm rounded-lg focus:ring-vintage-dark focus:border-vintage-brem block w-full p-2.5"
                                 placeholder="Masukkan Omset Bulanan" autocomplete="off" required>
                             @error('avg_monthly_turnover')
+                                <div class="mt-2 text-sm text-red-600 dark:text-red-500"><span class="font-medium">Peringatan,
+                                    </span> {{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div id="workplace_section" class="hidden">
+                            <label for="workplace" id="workplace_title" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">-</label>
+                            <input type="text" name="workplace" id="workplace"
+                                value="{{ old('workplace') }}"class="bg-vintage-light border border-vintage-brem text-vintage-dark text-sm rounded-lg focus:ring-vintage-dark focus:border-vintage-brem block w-full p-2.5"
+                                placeholder="Masukkan -" autocomplete="off" required>
+                            @error('workplace')
+                                <div class="mt-2 text-sm text-red-600 dark:text-red-500"><span class="font-medium">Peringatan,
+                                    </span> {{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div id="field_of_work_section" class="hidden">
+                            <label for="field_of_work" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Bidang Pekerjaan</label>
+                            <input type="text" name="field_of_work" id="field_of_work"
+                                value="{{ old('field_of_work') }}"class="bg-vintage-light border border-vintage-brem text-vintage-dark text-sm rounded-lg focus:ring-vintage-dark focus:border-vintage-brem block w-full p-2.5"
+                                placeholder="Masukkan Bidang Pekerjaan" autocomplete="off" required>
+                            @error('field_of_work')
                                 <div class="mt-2 text-sm text-red-600 dark:text-red-500"><span class="font-medium">Peringatan,
                                     </span> {{ $message }}</div>
                             @enderror

@@ -1,6 +1,8 @@
 let housingPartnerCode = "";
 let token = "";
-$("input[name='employment_status']").on("change", checkEmployementStatus);
+$("input[name='employment_status']").on("change", function(){
+    checkEmployementStatus($(this));
+});
 $("input[name='salary']").on("change", checkIncomeStatus);
 $("input[name='has_instalment']").on("change", checkInstalmentStatus);
 
@@ -50,16 +52,66 @@ function clearSelfEmployeeInput() {
     $("#avg_monthly_turnover_input").prop("required", false);
 }
 
-function checkEmployementStatus() {
-    if (!$("#self_employees").is(":checked")) {
-        $("#self_employee_as_section").addClass("hidden");
-        $("#avg_monthly_turnover_section").addClass("hidden");
-        clearSelfEmployeeInput();
-    } else {
+function clearNotSelfEmployeeInput() {
+    $("#workplace").val("");
+    $("#field_of_work").val("");
+
+    $("#workplace").prop("required", false);
+    $("#field_ofWork").prop("required", false);
+}
+
+function showSelfEmployeeInput(status){
+    if(status){
         $("#self_employee_as_section").removeClass("hidden");
         $("#avg_monthly_turnover_section").removeClass("hidden");
         $("#self_employee_as").prop("required", true);
         $("#avg_monthly_turnover_input").prop("required", true);
+    } else {
+        $("#self_employee_as_section").addClass("hidden");
+        $("#avg_monthly_turnover_section").addClass("hidden");
+        clearSelfEmployeeInput();
+    }
+}
+
+function showNotSelfEmployeeInput(status, id){
+    switch(id) {
+        case 'employees':
+            $('#workplace_title').html('Tempat Bekerja');
+            $('#workplace_title').siblings("input").attr('placeholder', 'Masukkan Tempat Bekerja');
+            break;
+        case 'civil_servants':
+            $('#workplace_title').html('Tempat Tugas Bekerja');
+            $('#workplace_title').siblings("input").attr('placeholder', 'Masukkan Tempat Tugas Bekerja');
+            break;
+        }
+
+    if(status){
+        $("#workplace_section").removeClass("hidden");
+        $("#field_of_work_section").removeClass("hidden");
+        $("#workplace").prop("required", true);
+        $("#field_of_work").prop("required", true);
+    } else {
+        $("#workplace_section").addClass("hidden");
+        $("#field_of_work_section").addClass("hidden");
+        clearNotSelfEmployeeInput();
+    }
+}
+
+function checkEmployementStatus(el) {
+    let inputId;
+
+    if(el){
+        inputId = el[0].id;
+    } else {
+        inputId = $("input[name='employment_status']:checked").attr('id')
+    }
+
+    if (!$("#self_employees").is(":checked")) {
+        showSelfEmployeeInput(false);
+        showNotSelfEmployeeInput(true,inputId);
+    } else {
+        showSelfEmployeeInput(true);
+        showNotSelfEmployeeInput(false,inputId);
     }
 }
 
