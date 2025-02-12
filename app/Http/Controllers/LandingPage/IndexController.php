@@ -47,21 +47,21 @@ class IndexController extends Controller
 
         $faqs = $query->cursorPaginate(5);
 
-        // $SEOfaqs = $query->limit(5)->get(['ask_question', 'answer'])->toArray();
-
-        // $SEOfaqs = array_map(function ($data) {
-        //     return [
-        //         '@type' => 'Question',
-        //         'name' => $data->ask_question,
-        //         'acceptedAnswer' => [
-        //             '@type' => 'Answer',
-        //             'text' => $data->answer,
-        //         ],
-        //     ];
-        // }, $faqs->items());
         $housingPartnersTotal = count($housingPartners) ?? 1;
 
-        return view('index', compact('housingPartners', 'housingPartnersTotal', 'houseLists', 'faqs', 'heroImage'));
+        $content = Cache::remember('index-contents', 60 * 60 * 24, function () {
+            return DB::table('contents')
+                ->first([
+                    'hero_title',
+                    'hero_description',
+                    'about_title',
+                    'about_description',
+                    'contact_email',
+                    'contact_phone'
+                ]);
+        });
+
+        return view('index', compact('housingPartners', 'housingPartnersTotal', 'houseLists', 'faqs', 'heroImage', 'content'));
     }
 
     public function getHouseLists(Request $request)

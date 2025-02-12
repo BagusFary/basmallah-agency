@@ -6,6 +6,7 @@
 
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/ScrollTrigger.min.js"></script>
 @endpush
 
 @section('content')
@@ -13,13 +14,11 @@
         style="background-image: url('{{ $heroImage ?? '' }}')">
         <div class="px-4 mx-auto max-w-screen-xl text-center py-24 lg:py-56">
             <h1 class="mb-4 text-4xl font-extrabold tracking-tight leading-none text-white md:text-5xl lg:text-6xl">
-                Basmallah Agency
+                {{ $content->hero_title ?? config('app.name') }}
             </h1>
-            <p class="mb-8 text-md font-normal text-gray-300 lg:text-xl sm:px-16 lg:px-48">
-                Sejak tahun 2025, Basmallah Agency berdedikasi untuk berkolaborasi dengan proyek perumahan subsidi yang
-                berdampak tinggi di lokasi paling strategis di Malang Raya. Kami menyediakan hunian yang nyaman dengan harga
-                terjangkau. Bersama kami, dapatkan hunian impian anda dengan mudah!
-            </p>
+            <div class="mb-8 text-md font-normal text-white lg:text-xl sm:px-16 lg:px-48">
+                {!! str($content->hero_description)->markdown()->sanitizeHtml() !!}
+            </div>
             <div class="flex flex-col space-y-4 sm:flex-row sm:justify-center sm:space-y-0">
                 <a href="#house-list"
                     class="text-vintage-dark bg-vintage-light focus:ring-4 focus:ring-vintage-brem font-medium rounded-lg text-sm px-6 py-3.5 dark:bg-vintage-cream dark:hover:bg-vintage-light focus:outline-none dark:focus:ring-vintage-light dark:text-black">
@@ -50,10 +49,9 @@
                     </span>
 
                 </h1>
-                <p class="mb-4 max-w-2xl text-black dark:text-gray-400 md:mb-12 md:text-lg mb-3 lg:mb-5 lg:text-xl">
-                    Basmallah Agency merupakan salah satu agency properti yang berkerjasama dengan perusahaan real estate
-                    dan developer terkemuka dan terpercaya di malang raya serta dikenal luas secara regional.
-                </p>
+                <div class="mb-4 max-w-2xl text-black dark:text-gray-400 md:mb-12 md:text-lg mb-3 lg:mb-5 lg:text-xl">
+                    {{ $content->about_description ?? 'Unknown Text.' }}
+                </div>
             </div>
             <div class="hidden md:col-span-5 md:mt-0 md:flex">
                 <img id="img-hero" class="dark:hidden" src="{{ asset('Hero Images.png') }}" alt="shopping illustration" />
@@ -82,10 +80,17 @@
 
     <section class="bg-vintage-dark py-8 antialiased md:py-16 px-3">
         <div class="container mx-auto">
+            <div class=" uppercase opacity-0 text-vintage-dark font-bold text-center w-full my-5 highlight-1">
+                <span class="bg-white p-1 text-lg md:text-2xl">Hanya disini!</span>
+            </div>
             <div class=" text-center text-white">
                 <h1 class="text-xl md:text-4xl font-bold uppercase">Hadiah Souvenir Menarik!</h1>
-                <span class="text-small font-light text-vintage-light">Dapatkan hadiah menarik dengan mendaftar melalui
+                <span class="text-small font-light text-vintage-light mt-2">
+                    Dapatkan hadiah menarik dengan mendaftar melalui
                     <b>Basmallah Agency</b>. <span class="underline">S&K</span></span>
+            </div>
+            <div class=" uppercase opacity-0 text-vintage-dark font-bold text-center w-full my-5 highlight-2">
+                <a href="#house-list" class="bg-white p-1 text-lg md:text-2xl">Daftar Sekarang</a>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 content-center">
                 <div class="flex flex-col justify-center items-center relative">
