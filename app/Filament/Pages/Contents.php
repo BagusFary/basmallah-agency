@@ -52,11 +52,11 @@ class Contents extends Page implements HasForms
                 ->schema([
                     TextInput::make('hero_title')
                         ->placeholder('Masukkan Judul Header')
-                        ->label('Hero Title')
+                        ->label('Title')
                         ->nullable(),
                     MarkdownEditor::make('hero_description')
                         ->placeholder('Masukkan Deskripsi')
-                        ->label('Hero Description')
+                        ->label('Description')
                         ->disableToolbarButtons([
                             'attachFiles'
                         ])
@@ -67,7 +67,7 @@ class Contents extends Page implements HasForms
                 ->schema([
                     MarkdownEditor::make('about_description')
                         ->placeholder('Masukkan Deskripsi Tentang Kami')
-                        ->label('Hero Description')
+                        ->label('Description')
                         ->disableToolbarButtons([
                             'attachFiles'
                         ])

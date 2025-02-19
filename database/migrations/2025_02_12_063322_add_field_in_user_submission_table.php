@@ -24,7 +24,7 @@ return new class extends Migration
     {
         Schema::table('user_submissions', function (Blueprint $table) {
             $table->dropColumn('workplace');
-            $table->dropColumn('filed_of_work');
+            $table->dropColumn('field_of_work');
         });
     }
 };

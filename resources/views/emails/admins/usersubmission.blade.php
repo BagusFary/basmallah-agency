@@ -29,9 +29,15 @@ Status Pekerjaan : <b>
     @default
 @endswitch
 </b> <br>
+@if(in_array($userSubmission['employment_status'], ['civil_servants', 'employees']))
+
+Tempat Bekerja : <b>{{ $userSubmission['workplace'] }}</b> <br>
+Bidang Pekerjaan : <b>{{ $userSubmission['field_of_work'] }}</b> <br>
+
+@endif
 @if ($userSubmission['employment_status'] == 'self_employees')
 Bidang Wirausaha : <b>{{ $userSubmission['self_employee_as'] }}</b> <br>
-Rata-rata Omset Bulanan : <b>{{ \Number::format($userSubmission['avg_monthly_turnover'], locale: 'id') }}</b> <br>
+Rata-rata Omset Bulanan : <b>Rp. {{ \Number::format($userSubmission['avg_monthly_turnover'], locale: 'id') }}</b> <br>
 @endif
 Punya Cicilan :
 <b>
@@ -42,11 +48,12 @@ Tidak
 @endif
 </b> <br>
 @if($userSubmission['has_instalment'] == '1')
-Jumlah Cicilan : <b>{{ \Number::format($userSubmission['instalment_amount'], locale: 'id') }}</b>
+Jumlah Cicilan : <b>Rp. {{ \Number::format($userSubmission['instalment_amount'], locale: 'id') }}</b>
 @endif
 <x-mail::subcopy>
 </x-mail::subcopy>
 
+@if (!empty($userSubmission['incomes']))
 <b>Penghasilan</b>
 <x-mail::table>
 | Tipe | Pendapatan |
@@ -70,12 +77,15 @@ Jumlah Cicilan : <b>{{ \Number::format($userSubmission['instalment_amount'], loc
 @endswitch
 @endforeach
 </x-mail::table>
-
 <x-mail::subcopy>
 </x-mail::subcopy>
+@endif
 <b>
     Jangan lupa selalu cek dashboard untuk mendapatkan informasi lengkap. <br>
 </b>
+<x-mail::button :url="config('app.filament_url').'/user-submissions'">
+Lihat Dashboard
+</x-mail::button>
 Terimakasih telah menggunakan website kami. :D<br>
 {{ config('app.name') }}
 </x-mail::message>

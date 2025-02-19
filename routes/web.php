@@ -9,10 +9,10 @@ Route::controller(IndexController::class)->group(function () {
     Route::get('/', 'index');
 });
 
-Route::get('/sendemail', function() {
-    $userSubmission = UserSubmission::latest()->first()->load('housingPartner', 'incomes');
-    return new App\Mail\SendUserSubmission($userSubmission->toArray());
-});
+// Route::get('/sendemail', function() {
+//     $userSubmission = UserSubmission::latest()->first()->load('housingPartner', 'incomes');
+//     return new App\Mail\SendUserSubmission($userSubmission->toArray());
+// });
 
 Route::prefix('housing-partners')->name('housing-partners.')->group(function () {
     Route::controller(SubmissionController::class)->group(function () {

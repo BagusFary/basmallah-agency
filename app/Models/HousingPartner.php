@@ -57,4 +57,9 @@ class HousingPartner extends Model
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
+
+    public function images()
+    {
+        return $this->hasMany(HousingPartnerImages::class);
+    }
 }

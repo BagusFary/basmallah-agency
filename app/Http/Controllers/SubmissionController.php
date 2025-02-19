@@ -16,7 +16,7 @@ class SubmissionController extends Controller
 {
     public function create($id)
     {
-        $housingPartners = HousingPartner::find($id);
+        $housingPartners = HousingPartner::find($id)->load('images');
         return view('submissions.create', [
             'housingPartners' => $housingPartners
         ]);

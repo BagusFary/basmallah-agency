@@ -88,6 +88,8 @@ return [
 
     'filament_systemdisk' => env('FILAMENT_FILESYSTEM_DISK', 'filament_disk'),
 
+    'filament_url' => env('FILAMENT_URL', 'http://dashboard.localhost:8000'),
+
     /*
     |--------------------------------------------------------------------------
     | Encryption Key

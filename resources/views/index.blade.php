@@ -148,8 +148,10 @@
                         @endif
 
                         <div class="relative">
-                            <img class="w-full md:min-w-64 md:max-w-64 h-[200px] object-center md:h-md md:rounded-lg sm:rounded-none rounded-t-lg md:rounded-b-md  object-cover"
-                                src="{{ asset("storage/$house->image_url") }}" alt="Bonnie Avatar">
+                            <a href="{{ str_contains($house->instagram, 'https') ? $house->instagram : ("https://www.instagram.com/" . $house->instagram)}}">
+                                <img class="w-full md:min-w-64 md:max-w-64 h-[200px] object-center md:h-md md:rounded-lg sm:rounded-none rounded-t-lg md:rounded-b-md  object-cover"
+                                    src="{{ asset("storage/$house->image_url") }}" alt="Bonnie Avatar">
+                            </a>
                         </div>
                         <div class="">
                             <div class="px-3 flex flex-col gap-3 self-stretch h-full">
@@ -179,7 +181,7 @@
 
                                 <div class="mt-auto mb-5">
                                     <a href="/housing-partners/{{ $house->id }}/submission"
-                                        class="border-2 hover:-translate-2 font-bold text-vintage-dark hover:bg-vintage-dark hover:text-white border px-3 py-2 border-vintage-dark bg-transparent">
+                                        class="border-2 hover:-translate-2 text-md font-bold text-vintage-dark hover:bg-vintage-dark hover:text-white border px-3 py-2 border-vintage-dark bg-transparent">
                                         Daftar Sekarang
                                     </a>
                                 </div>

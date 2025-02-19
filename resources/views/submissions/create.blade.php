@@ -4,13 +4,52 @@
 
 @section('description', 'Basmallah Agency merupakan Agen Properti yang sudah berjalan lama')
 
+@section('head')
+    @vite(['resources/js/submission.js'])
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+@endsection
+
 @section('body-class', 'bg-vintage-brem')
+
 @section('content')
 
-    <section class="container mx-auto">
+    <section class="container mx-auto max-w-screen-xl">
         <div class="px-3 py-8 md:py-[7em] ">
             <div class="w-full bg-white rounded-lg shadow border-2 dark:border dark:bg-gray-800 dark:border-gray-700">
+                @if (!empty($housingPartners->images))
+                    <div class="swiper max-h-84">
+                        <!-- Additional required wrapper -->
+                        <div class="swiper-wrapper">
+                            <!-- Slides -->
+                            @foreach ($housingPartners->images as $image)
+                                <div class="swiper-slide max-h-[600px] self-center ">
+                                    <div class="swiper-zoom-container relative">
+                                        <div
+                                            class="bg-vintage-dark text-vintage-dark p-3 uppercase tracking-[1em] absolute inset-x-0 top-0 rounded-t ">
+                                            Image
+                                        </div>
+                                        <div
+                                            class="bg-vintage-dark text-white p-3 uppercase tracking-[0.5em] absolute inset-x-0 bottom-0">
+                                            {{ $image->description }}
+                                        </div>
+                                        <img class="w-full rounded-t object-center object-contain md:h-[600px]"
+                                            src="{{ asset("storage/$image->image_url") }}" alt="">
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                        <!-- If we need navigation buttons -->
+                        <div class="swiper-button-prev"></div>
+                        <div class="swiper-button-next"></div>
+                    </div>
+                @endif
+
                 <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
+                    <div class="w-full">
+                        {!! str($housingPartners->description ?? 'Tidak Ada Deskripsi')->sanitizeHtml() !!}
+                    </div>
                     <div class="flex justify-between">
                         <div class="flex-row self-start mb-3">
                             <a id="title-name" href="#"
@@ -88,7 +127,8 @@
                             @enderror
                         </div>
                         <div>
-                            <label for="phone" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nomor
+                            <label for="phone"
+                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nomor
                                 WhatsApp</label>
                             <input type="text" inputmode="numeric" name="phone" id="phone"
                                 value="{{ old('phone') }}"
@@ -153,7 +193,8 @@
                             @enderror
                         </div>
                         <div id="workplace_section" class="hidden">
-                            <label for="workplace" id="workplace_title" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">-</label>
+                            <label for="workplace" id="workplace_title"
+                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">-</label>
                             <input type="text" name="workplace" id="workplace"
                                 value="{{ old('workplace') }}"class="bg-vintage-light border border-vintage-brem text-vintage-dark text-sm rounded-lg focus:ring-vintage-dark focus:border-vintage-brem block w-full p-2.5"
                                 placeholder="Masukkan -" autocomplete="off" required>
@@ -163,7 +204,9 @@
                             @enderror
                         </div>
                         <div id="field_of_work_section" class="hidden">
-                            <label for="field_of_work" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Bidang Pekerjaan</label>
+                            <label for="field_of_work"
+                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Bidang
+                                Pekerjaan</label>
                             <input type="text" name="field_of_work" id="field_of_work"
                                 value="{{ old('field_of_work') }}"class="bg-vintage-light border border-vintage-brem text-vintage-dark text-sm rounded-lg focus:ring-vintage-dark focus:border-vintage-brem block w-full p-2.5"
                                 placeholder="Masukkan Bidang Pekerjaan" autocomplete="off" required>

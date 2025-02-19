@@ -16,9 +16,13 @@ use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\HousingPartnerResource\Pages;
 use App\Models\Income;
 use App\Models\UserSubmission;
+use Filament\Forms\Components\Fieldset;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Repeater;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
+use PhpOffice\PhpSpreadsheet\RichText\RichText;
 
 class HousingPartnerResource extends Resource
 {
@@ -32,11 +36,6 @@ class HousingPartnerResource extends Resource
             ->schema([
                 Forms\Components\Hidden::make('user_id')
                     ->default(Auth::user()->id),
-                Forms\Components\TextInput::make('code')
-                    ->label('Code')
-                    ->required()
-                    ->maxLength(50)
-                    ->unique(ignoreRecord: true),
                 Forms\Components\FileUpload::make('image_url')
                     ->label('Image')
                     ->image()
@@ -52,7 +51,57 @@ class HousingPartnerResource extends Resource
                         if (isset($record->image_url) && $state) {
                             $storageImage->delete($record->image_url);
                         }
-                    }),
+                    })
+                    ->columnSpanFull(),
+                Fieldset::make('Housing Partner Image')
+                    ->schema([
+                        Repeater::make('images')
+                            ->label('')
+                            ->addActionLabel('Add Housing Partner Image')
+                            ->relationship()
+                            ->schema([
+                                TextInput::make('description')
+                                    ->label('Image Description')
+                                    ->required(),
+                                Forms\Components\FileUpload::make('image_url')
+                                    ->label('Image')
+                                    ->image()
+                                    ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file): string {
+                                        $fileExtension = $file->getClientOriginalExtension();
+                                        $fileName = $file->getClientOriginalName();
+                                        $hashedName = md5($fileName . uniqid());
+                                        return (string) "housingpartnerimages/{$hashedName}.{$fileExtension}";
+                                    })
+                                    ->required()
+                                    ->afterStateUpdated(function ($state, $record) {
+                                        $storageImage = Storage::disk('filament_disk');
+                                        if (isset($record->image_url) && $state) {
+                                            $storageImage->delete($record->image_url);
+                                        }
+                                    })
+                                    ->columnSpanFull(),
+                            ])
+                            ->columnSpanFull(),
+                    ]),
+                Forms\Components\RichEditor::make('description')
+                    ->disableToolbarButtons([
+                        'orderedList',
+                        'bulletList',
+                        'link',
+                        'redo',
+                        'attachFiles',
+                        'codeBlock',
+                        'blockquote',
+                        'undo'
+                    ])
+                    ->required()
+                    ->columnSpanFull(),
+                Forms\Components\TextInput::make('code')
+                    ->label('Code')
+                    ->required()
+                    ->maxLength(50)
+                    ->unique(ignoreRecord: true),
+
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255),
@@ -67,8 +116,8 @@ class HousingPartnerResource extends Resource
                     ->maxLength(255)
                     ->unique(ignoreRecord: true),
                 Forms\Components\TextInput::make('instagram')
-                ->label('Username Instagram')
-                ->required(),
+                    ->label('Username/Url Instagram')
+                    ->placeholder('ex. username or https://www.instagram.com/username'),
                 Forms\Components\TextInput::make('booking_fee')
                     ->label('Booking Fee')
                     ->prefix('Rp.')

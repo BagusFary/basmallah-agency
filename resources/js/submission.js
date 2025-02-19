@@ -1,6 +1,6 @@
 let housingPartnerCode = "";
 let token = "";
-$("input[name='employment_status']").on("change", function(){
+$("input[name='employment_status']").on("change", function () {
     checkEmployementStatus($(this));
 });
 $("input[name='salary']").on("change", checkIncomeStatus);
@@ -60,8 +60,8 @@ function clearNotSelfEmployeeInput() {
     $("#field_ofWork").prop("required", false);
 }
 
-function showSelfEmployeeInput(status){
-    if(status){
+function showSelfEmployeeInput(status) {
+    if (status) {
         $("#self_employee_as_section").removeClass("hidden");
         $("#avg_monthly_turnover_section").removeClass("hidden");
         $("#self_employee_as").prop("required", true);
@@ -73,19 +73,23 @@ function showSelfEmployeeInput(status){
     }
 }
 
-function showNotSelfEmployeeInput(status, id){
-    switch(id) {
-        case 'employees':
-            $('#workplace_title').html('Tempat Bekerja');
-            $('#workplace_title').siblings("input").attr('placeholder', 'Masukkan Tempat Bekerja');
+function showNotSelfEmployeeInput(status, id) {
+    switch (id) {
+        case "employees":
+            $("#workplace_title").html("Tempat Bekerja");
+            $("#workplace_title")
+                .siblings("input")
+                .attr("placeholder", "Masukkan Tempat Bekerja");
             break;
-        case 'civil_servants':
-            $('#workplace_title').html('Tempat Tugas Bekerja');
-            $('#workplace_title').siblings("input").attr('placeholder', 'Masukkan Tempat Tugas Bekerja');
+        case "civil_servants":
+            $("#workplace_title").html("Tempat Tugas Bekerja");
+            $("#workplace_title")
+                .siblings("input")
+                .attr("placeholder", "Masukkan Tempat Tugas Bekerja");
             break;
-        }
+    }
 
-    if(status){
+    if (status) {
         $("#workplace_section").removeClass("hidden");
         $("#field_of_work_section").removeClass("hidden");
         $("#workplace").prop("required", true);
@@ -100,20 +104,22 @@ function showNotSelfEmployeeInput(status, id){
 function checkEmployementStatus(el) {
     let inputId;
 
-    if(el){
+    if (el) {
         inputId = el[0].id;
     } else {
-        inputId = $("input[name='employment_status']:checked").attr('id')
+        inputId = $("input[name='employment_status']:checked").attr("id");
     }
 
     if (!$("#self_employees").is(":checked")) {
-        $('#self_income_title').html('Jumlah Penghasilan Pribadi')
+        $("#self_income_title").html("Jumlah Penghasilan Pribadi");
         showSelfEmployeeInput(false);
-        showNotSelfEmployeeInput(true,inputId);
+        showNotSelfEmployeeInput(true, inputId);
     } else {
-        $('#self_income_title').html('Jumlah Penghasilan Pribadi (Kosongi bila tidak ada)')
+        $("#self_income_title").html(
+            "Jumlah Penghasilan Pribadi (Kosongi bila tidak ada)"
+        );
         showSelfEmployeeInput(true);
-        showNotSelfEmployeeInput(false,inputId);
+        showNotSelfEmployeeInput(false, inputId);
     }
 }
 
@@ -212,12 +218,27 @@ function removeSensitiveField() {
     $("#code").remove();
 }
 
+function initSwiper() {
+    const swiper = new Swiper(".swiper", {
+        // Optional parameters
+        direction: "horizontal",
+        loop: false,
+
+        // Navigation arrows
+        navigation: {
+            nextEl: ".swiper-button-next",
+            prevEl: ".swiper-button-prev",
+        },
+    });
+}
+
 $(document).ready(function () {
     removeSensitiveField();
     checkEmployementStatus();
     checkIncomeStatus();
     checkInstalmentStatus();
     updateTotalIncome();
+    initSwiper();
 });
 
 $(".share-button").on("click", async (event) => {

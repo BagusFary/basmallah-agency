@@ -126,13 +126,13 @@ function StartUpGSAP() {
             {
                 scale: 1.5,
                 duration: 1,
-                padding: "3rem",
+                // padding: "3rem",
                 ease: "power4.inOut",
             },
             {
                 scale: 1,
                 duration: 1,
-                padding: "0rem",
+                // padding: "0rem",
                 delay: 1,
                 ease: "power4.inOut",
             },
@@ -153,13 +153,13 @@ function StartUpGSAP() {
             {
                 scale: 1.5,
                 duration: 1,
-                padding: "3rem",
+                // padding: "3rem",
                 ease: "power4.inOut",
             },
             {
                 scale: 1,
                 duration: 1,
-                padding: "0rem",
+                // padding: "0rem",
                 delay: 1,
                 ease: "power4.inOut",
             },
