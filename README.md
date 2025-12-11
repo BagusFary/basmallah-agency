@@ -89,6 +89,15 @@ php artisan db:seed
 composer run dev
 ```
 
+Info Tambahan:\
+
+Hero Image → Tambahkan melalui Admin Panel pada menu Hero image, agar tidak error.
+
+FAQ → Kelola pada menu FAQ, tambahkan pertanyaan dan jawaban baru.
+
+Content Management → Atur keterangan teks Basmallah Agency pada landing page.
+
+
 Akses:\
 Landing Page → http://localhost:8000\
 
